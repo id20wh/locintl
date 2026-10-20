@@ -1,0 +1,3855 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>L-OCEAN INTERNATIONAL | Pacific & Global Trophy Land Developer</title>
+  <meta name="description" content="하와이와 환태평양 7대 거점의 대지를 선별하고 매입하여 자연과 건축, 지속 가능한 유산을 축조하는 글로벌 부동산 디벨로퍼 엘오션인터내셔널">
+
+  <!-- Google Fonts & Pretendard -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            makapuu: {
+              night: '#060B12',
+              dark: '#0A1420',
+              deep: '#0F1E31',
+              surf: '#162A45',
+              slate: '#284366',
+              mist: '#4A6B94'
+            },
+            sand: {
+              base: '#FAF8F5',
+              ecru: '#F4EFE6',
+              warm: '#E8DFD1',
+              gold: '#C5A676',
+              brightGold: '#DFC08F',
+              bronze: '#9F7C48'
+            }
+          },
+          fontFamily: {
+            serif: ['Cormorant Garamond', 'serif'],
+            sans: ['Plus Jakarta Sans', '"Apple SD Gothic Neo"', '"Apple Gothic"', 'Pretendard', 'sans-serif'],
+            kr: ['"Apple SD Gothic Neo"', '"Apple Gothic"', 'Pretendard', '-apple-system', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #0A1420;
+      color: #FAF8F5;
+      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Apple Gothic", "Plus Jakarta Sans", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: "Apple SD Gothic Neo", "Apple Gothic", -apple-system, "Plus Jakarta Sans", sans-serif;
+    }
+    
+    .font-serif {
+      font-family: 'Cormorant Garamond', "Apple SD Gothic Neo", "Apple Gothic", serif;
+    }
+
+    /* Ambient Whale Canvas */
+    #whale-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.35;
+      mix-blend-mode: screen;
+    }
+
+    /* Realistic Ocean Swell & Crashing Foam Canvas */
+    #pacific-ocean-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* 3D Globe */
+    #globe-viewport {
+      width: 100%;
+      height: 520px;
+      cursor: grab;
+      position: relative;
+    }
+    #globe-viewport:active {
+      cursor: grabbing;
+    }
+
+    /* Subtle Architectural Grid Pattern */
+    .ocean-grid-bg {
+      background-image: 
+        linear-gradient(to right, rgba(197, 166, 118, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(197, 166, 118, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #060B12;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #162A45;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C5A676;
+    }
+
+    .sand-border {
+      border-color: rgba(244, 239, 230, 0.12);
+    }
+
+    /* Celestial Astrolabe Compass Styles */
+    .compass-container {
+      perspective: 1200px;
+    }
+    .compass-astrolabe-glow {
+      box-shadow: 0 0 60px -10px rgba(197, 166, 118, 0.25), inset 0 0 40px -10px rgba(197, 166, 118, 0.15);
+      transition: box-shadow 0.4s ease, border-color 0.4s ease;
+    }
+    .compass-spinning-active {
+      box-shadow: 0 0 100px 10px rgba(223, 192, 143, 0.65), 
+                  0 0 45px 5px rgba(255, 226, 159, 0.8), 
+                  inset 0 0 60px 10px rgba(223, 192, 143, 0.45) !important;
+      border-color: rgba(255, 230, 160, 0.9) !important;
+    }
+    .compass-ring-outer {
+      transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .compass-ring-inner {
+      transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .compass-needle {
+      transition: transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+      transform-origin: 50% 50%;
+    }
+    .compass-pulse-ring {
+      animation: compassPulse 3.5s infinite ease-out;
+    }
+    @keyframes compassPulse {
+      0% { transform: scale(0.85); opacity: 0.6; }
+      50% { transform: scale(1.08); opacity: 0.15; }
+      100% { transform: scale(0.85); opacity: 0.6; }
+    }
+    #compass-sparkle-canvas {
+      position: absolute;
+      top: -140px;
+      left: -140px;
+      right: -140px;
+      bottom: -140px;
+      width: calc(100% + 280px);
+      height: calc(100% + 280px);
+      pointer-events: none;
+      z-index: 35;
+      overflow: visible;
+    }
+
+    /* Golden Halo Ambient Glow in Compass Center */
+    .compass-golden-halo {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(223, 192, 143, 0.45) 0%, rgba(255, 226, 159, 0.2) 35%, rgba(10, 20, 32, 0) 70%);
+      pointer-events: none;
+      opacity: 0.3;
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      mix-blend-mode: screen;
+      z-index: 5;
+    }
+    .compass-ring-outer {
+      transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .compass-ring-inner {
+      transition: transform 2.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .compass-needle {
+      transition: transform 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+      transform-origin: 50% 50%;
+    }
+    .compass-pulse-ring {
+      animation: compassPulse 3.5s infinite ease-out;
+    }
+    @keyframes compassPulse {
+      0% { transform: scale(0.85); opacity: 0.6; }
+      50% { transform: scale(1.08); opacity: 0.15; }
+      100% { transform: scale(0.85); opacity: 0.6; }
+    }
+    #compass-sparkle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Ocean Vortex 3D Wave Orbit & Carousel */
+    .vortex-stage {
+      perspective: 1400px;
+      perspective-origin: 50% 45%;
+    }
+    .vortex-track {
+      transform-style: preserve-3d;
+      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .wave-node-card {
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), 
+                  opacity 0.6s ease, 
+                  border-color 0.4s ease, 
+                  box-shadow 0.4s ease,
+                  filter 0.5s ease;
+    }
+    .wave-node-card.active-node {
+      border-color: rgba(223, 192, 143, 0.85);
+      box-shadow: 0 20px 50px -10px rgba(197, 166, 118, 0.35), inset 0 0 20px rgba(197, 166, 118, 0.12);
+      filter: drop-shadow(0 0 25px rgba(223, 192, 143, 0.3));
+    }
+    .wave-card-img-wrap {
+      overflow: hidden;
+      border-radius: 1rem;
+      position: relative;
+    }
+    .wave-card-img-wrap img {
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .wave-node-card:hover .wave-card-img-wrap img,
+    .wave-node-card.active-node .wave-card-img-wrap img {
+      transform: scale(1.06);
+    }
+
+    #vortex-waves-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Modal Backdrop Transitions */
+    .modal-backdrop {
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-card {
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    }
+  </style>
+</head>
+<body class="selection:bg-sand-gold selection:text-makapuu-night ocean-grid-bg">
+
+  <!-- Background Animated Humpback Whale Simulation -->
+  <canvas id="whale-canvas"></canvas>
+
+  <!-- ALWAYS FIXED TOP NAVIGATION BAR -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-makapuu-dark/95 backdrop-blur-xl border-b sand-border transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo: Exact Official Seal Graphic (변형 없는 원본 심볼 반영) -->
+      <a href="#" class="flex items-center space-x-3.5 group">
+        <!-- Exact Official Emblem: Whale Breaching from Pacific Waves Seal -->
+        <div class="w-12 h-12 rounded-full border border-sand-gold/40 p-0.5 overflow-hidden bg-[#182333] shadow-lg flex-shrink-0 transition-transform duration-500 group-hover:scale-105 flex items-center justify-center">
+          <svg viewBox="0 0 500 500" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Arc text paths for L-OCEAN & INTERNATIONAL -->
+              <path id="locean-seal-top-path" d="M 75,250 A 175,175 0 0,1 425,250" fill="none"/>
+              <path id="locean-seal-bottom-path" d="M 430,250 A 180,180 0 0,1 70,250" fill="none"/>
+            </defs>
+
+            <!-- Background Deep Navy Disc matching business card -->
+            <circle cx="250" cy="250" r="248" fill="#182333"/>
+
+            <!-- Outer Marine Nautical Rope Border Pattern -->
+            <circle cx="250" cy="250" r="236" fill="none" stroke="#EFEFF4" stroke-width="12" stroke-linecap="round" stroke-dasharray="7 13" transform="rotate(15 250 250)"/>
+
+            <!-- Thin Concentric Seal Boundary Rings -->
+            <circle cx="250" cy="250" r="222" fill="none" stroke="#EFEFF4" stroke-width="3.5"/>
+            <circle cx="250" cy="250" r="142" fill="none" stroke="#EFEFF4" stroke-width="4"/>
+
+            <!-- Top Curved Text: L - O C E A N -->
+            <text fill="#EFEFF4" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="44" font-weight="900" letter-spacing="0.16em">
+              <textPath href="#locean-seal-top-path" startOffset="50%" text-anchor="middle">L-OCEAN</textPath>
+            </text>
+
+            <!-- Bottom Curved Text: I N T E R N A T I O N A L -->
+            <text fill="#EFEFF4" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="28" font-weight="900" letter-spacing="0.22em">
+              <textPath href="#locean-seal-bottom-path" startOffset="50%" text-anchor="middle">INTERNATIONAL</textPath>
+            </text>
+
+            <!-- Left Badging: SINCE 1991 with 2 Stars & Dividers -->
+            <!-- Left Star Top -->
+            <polygon points="82,216 85,224 93,224 87,229 89,237 82,232 75,237 77,229 71,224 79,224" fill="#EFEFF4"/>
+            <!-- Left Divider Line Top -->
+            <line x1="68" y1="243" x2="96" y2="243" stroke="#EFEFF4" stroke-width="2"/>
+            <!-- Left Label: SINCE -->
+            <text x="82" y="254" fill="#EFEFF4" font-family="'Plus Jakarta Sans', sans-serif" font-size="11" font-weight="800" letter-spacing="0.1em" text-anchor="middle">SINCE</text>
+            <!-- Left Divider Line Bottom -->
+            <line x1="68" y1="261" x2="96" y2="261" stroke="#EFEFF4" stroke-width="2"/>
+            <!-- Left Star Bottom -->
+            <polygon points="82,267 85,275 93,275 87,280 89,288 82,283 75,288 77,280 71,275 79,275" fill="#EFEFF4"/>
+
+            <!-- Right Badging: 1991 with 2 Stars & Dividers -->
+            <!-- Right Star Top -->
+            <polygon points="418,216 421,224 429,224 423,229 425,237 418,232 411,237 413,229 407,224 415,224" fill="#EFEFF4"/>
+            <!-- Right Divider Line Top -->
+            <line x1="404" y1="243" x2="432" y2="243" stroke="#EFEFF4" stroke-width="2"/>
+            <!-- Right Label: 1991 -->
+            <text x="418" y="254" fill="#EFEFF4" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="800" letter-spacing="0.1em" text-anchor="middle">1991</text>
+            <!-- Right Divider Line Bottom -->
+            <line x1="404" y1="261" x2="432" y2="261" stroke="#EFEFF4" stroke-width="2"/>
+            <!-- Right Star Bottom -->
+            <polygon points="418,267 421,275 429,275 423,280 425,288 418,283 411,288 413,280 407,275 415,275" fill="#EFEFF4"/>
+
+            <!-- Central Medallion: Breaching Humpback Whale & Crashing Crest Waves -->
+            <g id="official-breaching-whale-artwork">
+              <!-- Background Solar Disc / Horizon behind Whale -->
+              <circle cx="250" cy="245" r="136" fill="#182333"/>
+              
+              <!-- Solar/Moon disc crescent inner rim -->
+              <path d="M 180,185 A 136,136 0 0,1 386,245 C 386,170 310,135 250,135 C 215,135 190,155 180,185 Z" fill="#EFEFF4" opacity="0.95"/>
+
+              <!-- Main Whale Head, Upper Jaw & Arching Dorsal Body -->
+              <path d="M 285,153 C 255,152 230,165 208,188 C 190,208 178,232 173,260 C 188,245 205,230 226,220 C 235,215 245,213 255,214 C 275,215 292,185 285,153 Z" fill="#182333"/>
+              <path d="M 288,154 C 248,153 218,170 196,196 C 180,216 170,240 165,268 C 172,248 186,226 206,206 C 228,185 256,170 288,154 Z" fill="#EFEFF4"/>
+
+              <!-- Whale Rostrum and Head Crest Engraving -->
+              <path d="M 286,155 C 270,154 250,162 235,174 C 220,188 210,205 202,224 C 220,208 240,195 264,184 C 276,178 286,168 286,155 Z" fill="#EFEFF4"/>
+              
+              <!-- Rostrum Tubercles & Knobs -->
+              <circle cx="270" cy="162" r="2.2" fill="#182333"/>
+              <circle cx="256" cy="170" r="2.2" fill="#182333"/>
+              <circle cx="242" cy="180" r="2.2" fill="#182333"/>
+              <circle cx="230" cy="192" r="2.2" fill="#182333"/>
+
+              <!-- Whale Jawline Grooves & Pleats (Ventral Grooves) -->
+              <path d="M 285,155 C 265,162 248,178 238,198 C 228,218 218,245 212,272" stroke="#EFEFF4" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+              <path d="M 276,166 C 258,175 244,192 234,212 C 225,232 216,256 211,280" stroke="#EFEFF4" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <path d="M 268,178 C 252,188 240,206 231,226 C 223,246 215,268 212,290" stroke="#EFEFF4" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+              <path d="M 258,190 C 245,202 236,218 228,238 C 221,257 215,278 213,298" stroke="#EFEFF4" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 248,204 C 238,216 231,232 225,250 C 220,268 215,286 214,305" stroke="#EFEFF4" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <path d="M 238,218 C 230,232 225,248 220,264 C 216,280 213,296 213,312" stroke="#EFEFF4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M 228,232 C 222,246 218,262 215,278 C 213,292 212,306 212,320" stroke="#EFEFF4" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Massive Pectoral Flipper Wing (Humpback Signature) -->
+              <path d="M 242,216 C 248,238 250,264 246,290 C 242,316 234,338 220,358 C 228,340 236,316 238,290 C 240,265 236,242 228,222 Z" fill="#EFEFF4"/>
+              <!-- Flipper Scalloped Trailing Edge Knobs -->
+              <path d="M 246,220 C 258,250 262,282 258,315 C 255,338 245,360 232,378 C 236,362 242,342 244,320 C 246,292 242,264 235,238 Z" fill="#EFEFF4" opacity="0.95"/>
+
+              <!-- Right Swirling Wave Vortex (파도 소용돌이) -->
+              <path d="M 288,272 C 304,260 326,262 334,278 C 342,295 330,314 312,316 C 295,318 282,304 286,288 C 289,275 304,270 314,277 C 322,283 322,294 315,299 C 308,303 300,299 300,292 C 300,287 305,284 309,286" stroke="#EFEFF4" stroke-width="6" fill="none" stroke-linecap="round"/>
+              <path d="M 324,258 C 345,268 354,295 344,318 C 334,340 306,350 282,342 C 265,336 254,322 255,308" stroke="#EFEFF4" stroke-width="5" fill="none" stroke-linecap="round"/>
+
+              <!-- Left Breaker Surge & Wave Crest (좌측 솟구치는 거센 물결) -->
+              <path d="M 160,282 C 168,266 182,260 194,270 C 205,280 200,298 186,306 C 172,314 156,308 152,294 C 149,282 158,272 170,274" stroke="#EFEFF4" stroke-width="5" fill="none" stroke-linecap="round"/>
+              <path d="M 148,274 C 138,288 140,308 154,322 C 168,336 192,342 216,336" stroke="#EFEFF4" stroke-width="5.5" fill="none" stroke-linecap="round"/>
+
+              <!-- Rolling Swell Foams Across the Sea Surface (하단 전면 파도 띠) -->
+              <path d="M 144,300 C 180,332 230,350 290,345 C 330,342 365,322 384,295 C 370,326 332,354 288,358 C 228,362 175,340 144,300 Z" fill="#EFEFF4"/>
+              <path d="M 152,324 C 190,356 242,374 300,370 C 342,366 376,346 395,318 C 382,348 344,376 298,380 C 236,385 182,364 152,324 Z" fill="#EFEFF4"/>
+              <path d="M 172,352 C 208,382 256,396 312,392 C 348,390 378,374 394,350 C 380,376 348,398 310,402 C 252,406 200,388 172,352 Z" fill="#EFEFF4"/>
+              <path d="M 194,380 C 228,406 270,418 318,414 C 346,412 370,400 384,380 C 370,402 344,418 316,420 C 266,424 220,410 194,380 Z" fill="#EFEFF4"/>
+            </g>
+          </svg>
+        </div>
+        <div class="flex items-center">
+          <span class="font-sans text-sm sm:text-base font-bold tracking-[0.24em] text-sand-base uppercase group-hover:text-sand-brightGold transition-colors">
+            L-OCEAN INTERNATIONAL
+          </span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation (Reordered as requested) -->
+      <nav id="desktop-nav" class="hidden lg:flex items-center space-x-8 text-[11px] uppercase tracking-[0.22em] font-sans text-sand-ecru/70">
+        <a href="#ocean-grid-business" data-nav-target="ocean-grid-business" class="nav-link transition-all duration-300 py-1 whitespace-nowrap transform-gpu origin-center">OCEAN GRID</a>
+        <a href="#compass-heritage" data-nav-target="compass-heritage" class="nav-link transition-all duration-300 py-1 whitespace-nowrap transform-gpu origin-center">THE COMPASS</a>
+        <a href="#worldview" data-nav-target="worldview" class="nav-link transition-all duration-300 py-1 whitespace-nowrap transform-gpu origin-center">WORLDVIEW</a>
+        <a href="#global-grid" data-nav-target="global-grid" class="nav-link transition-all duration-300 py-1 whitespace-nowrap transform-gpu origin-center">PORTFOLIO</a>
+      </nav>
+
+      <!-- Private Protocol Button (Centered) -->
+      <div class="flex items-center justify-center flex-shrink-0">
+        <a href="#contact" class="inline-flex items-center justify-center text-center px-6 py-2.5 rounded-full border border-sand-gold/50 bg-sand-gold/10 hover:bg-sand-gold hover:text-makapuu-night text-sand-brightGold text-[11px] font-sans font-medium tracking-[0.18em] uppercase transition-all duration-300 whitespace-nowrap">
+          Private Protocol
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SPACER TO PREVENT STICKY HEADER OVERLAP -->
+  <div class="h-20"></div>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="relative z-10">
+
+    <!-- ==========================================================
+         PAGE 1: HERO & BRAND PROCLAMATION (정돈된 하이엔드 에디토리얼 레이아웃)
+         ========================================================== -->
+    <section id="hero-sanctuary" class="relative min-h-[92vh] flex flex-col justify-between pt-20 sm:pt-28 pb-16 px-6 border-b sand-border bg-gradient-to-b from-makapuu-dark via-makapuu-night to-makapuu-night overflow-hidden">
+      
+      <!-- Seamless Integrated Ocean Surge & Whitecap Canvas in Background -->
+      <canvas id="pacific-ocean-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+      <!-- Atmospheric Vignette Gradients for Flawless Text Readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-makapuu-dark/90 via-makapuu-night/60 to-makapuu-night/95 pointer-events-none z-[1]"></div>
+
+      <!-- Hero Header & Title Content -->
+      <div class="max-w-5xl mx-auto text-center relative z-10 my-auto w-full py-6">
+        
+        <!-- Category Badge / Monogram Rule -->
+        <div class="flex items-center justify-center space-x-3 mb-6">
+          <span class="w-8 h-[1px] bg-sand-gold/40"></span>
+          <span class="text-[10px] sm:text-[11px] font-mono tracking-[0.32em] text-sand-gold uppercase">Pacific Trophy Land Developer</span>
+          <span class="w-8 h-[1px] bg-sand-gold/40"></span>
+        </div>
+
+        <!-- Main Title: 광활한 공간감과 황금 비율 타이포그래피 (겹침 방지) -->
+        <h1 class="font-serif text-3xl sm:text-5xl lg:text-6xl xl:text-7xl text-sand-base font-light tracking-tight leading-[1.25] mb-8 break-keep">
+          Born from the Pacific Swell,<br>
+          <span class="font-normal italic text-sand-brightGold">Curating Earth's Rarest Grounds</span>
+        </h1>
+
+        <!-- High-End Editorial Narrative: 겹치지 않도록 충분한 간격 부여 -->
+        <div class="max-w-2xl mx-auto mb-10 space-y-4">
+          <p class="font-sans text-xs sm:text-sm text-sand-ecru/80 font-light tracking-wide leading-relaxed">
+            L-Ocean International acquires super-prime land parcels across Pacific gateways,<br class="hidden sm:inline"> transforming scarce natural topography into enduring architectural monuments of sovereignty.
+          </p>
+          <div class="w-10 h-[1px] bg-sand-gold/30 mx-auto"></div>
+          <p class="font-kr text-xs sm:text-sm text-sand-brightGold/90 font-normal leading-relaxed break-keep">
+            환태평양 7대 핵심 축의 대지를 직접 선별·매입하고 가치를 극대화하여,<br class="hidden sm:inline"> 세대를 관통하는 독보적인 문화와 헤리티지를 축조합니다.
+          </p>
+        </div>
+
+        <!-- Action CTA Buttons -->
+        <div class="flex items-center justify-center pt-2">
+          <a href="#global-grid" class="px-10 py-3.5 rounded-full border border-sand-gold/60 text-sand-brightGold hover:text-makapuu-night hover:bg-sand-gold hover:border-sand-gold font-sans font-semibold text-xs uppercase tracking-[0.24em] transition-all duration-300 bg-makapuu-night/60 backdrop-blur-md shadow-xl hover:shadow-sand-gold/25 hover:-translate-y-0.5">
+            7 Global Hubs Portfolio
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Integrated Floating Narrative Quote over Ocean Waves -->
+      <div class="relative z-10 max-w-4xl mx-auto text-center pointer-events-none pt-8">
+        <p class="font-serif italic text-sm sm:text-base text-sand-brightGold/85 tracking-wide mb-2 block">
+          "The ocean dissolves the transient; only sovereign land carves eternity."
+        </p>
+        <span class="font-mono text-[9px] tracking-[0.3em] uppercase text-sand-ecru/40 block">
+          Pacific Ocean Dynamics Engine — Makapu'u Wave Crests
+        </span>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================
+         PAGE 2: THE OCEAN GRID (세계관 '바다' & 현실의 3대 핵심 비즈니스 포트폴리오)
+         ========================================================== -->
+    <section id="ocean-grid-business" class="py-24 sm:py-32 px-6 border-b sand-border bg-makapuu-night relative overflow-hidden">
+      
+      <!-- Flagship Vessel Bow Wave & Hull Dynamics Canvas -->
+      <canvas id="interactive-ocean-grid-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+      
+      <!-- Architectural Radial Gradient & Atmosphere -->
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-makapuu-surf/25 via-makapuu-night/85 to-makapuu-night pointer-events-none z-[1]"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-4xl mx-auto mb-16">
+          <div class="inline-flex items-center space-x-3 mb-5 px-4 py-1.5 rounded-full bg-makapuu-deep/80 border border-sand-gold/30 backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-pulse"></span>
+            <span class="text-sand-brightGold font-serif italic text-sm sm:text-base">1. The Ocean Grid Ecosystem</span>
+            <span class="w-4 h-[1px] bg-sand-gold/40"></span>
+            <span class="text-[10px] uppercase tracking-[0.28em] font-mono text-sand-ecru/70">Worldview &amp; Tangible Empires</span>
+          </div>
+
+          <h2 class="font-serif text-3xl sm:text-5xl lg:text-6xl text-sand-base font-normal tracking-tight leading-[1.2] mb-3 block">
+            The Ocean Grid
+          </h2>
+
+          <h3 class="font-kr text-2xl sm:text-4xl lg:text-5xl text-sand-brightGold font-bold tracking-tight leading-[1.3] mb-6 block">
+            엘오션의 바다, 핵심 사업영역
+          </h3>
+
+          <div class="max-w-2xl mx-auto px-4">
+            <p class="font-kr text-sand-ecru/85 text-xs sm:text-sm sm:text-base font-light leading-relaxed break-keep tracking-wide block mb-8">
+              ‘오션 그리드(The Ocean Grid)’는 엘오션인터내셔널이 구축하는 무한한 비즈니스의 바다입니다.<br>서로 다른 영역의 가치들이 하나의 거대한 바다 위에서 유기적으로 연결되고 확장됩니다.
+            </p>
+
+            <!-- Naval Meridian Rule with Radar Beacon -->
+            <div class="flex items-center justify-center space-x-4 my-6 opacity-90">
+              <span class="h-[1px] flex-1 bg-gradient-to-r from-transparent via-sand-gold/50 to-sand-gold"></span>
+              <div class="flex items-center space-x-2.5 px-3 py-1 rounded-full bg-makapuu-deep/90 border border-sand-gold/40 shadow-lg">
+                <span class="font-mono text-[10px] tracking-[0.3em] uppercase text-sand-brightGold font-semibold">OUR BUSINESS</span>
+              </div>
+              <span class="h-[1px] flex-1 bg-gradient-to-l from-transparent via-sand-gold/50 to-sand-gold"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Real-Time Naval Bridge Command Console (Flagship Bridge Telemetry) -->
+        <div class="mb-12 rounded-2xl bg-gradient-to-b from-makapuu-deep/95 via-makapuu-dark/95 to-makapuu-night/95 border border-sand-gold/40 backdrop-blur-2xl font-mono text-[11px] shadow-[0_20px_50px_rgba(0,0,0,0.6)] relative overflow-hidden">
+          
+          <!-- Top Console Trim & Corner Reticles -->
+          <div class="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-emerald-400 pointer-events-none"></div>
+          <div class="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-emerald-400 pointer-events-none"></div>
+          <div class="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent"></div>
+
+          <!-- Bridge Upper Deck: Flagship Vessel Identifier & Command Readiness Status -->
+          <div class="px-6 sm:px-8 py-4 bg-makapuu-night/80 border-b border-sand-gold/20 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center space-x-3.5">
+              <!-- Traffic Light Emerald Indicator with Ping -->
+              <span class="relative flex h-3.5 w-3.5 items-center justify-center">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400 shadow-[0_0_12px_#34d399]"></span>
+              </span>
+              
+              <!-- Vessel & Squadron Callout -->
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="text-sand-gold font-bold tracking-widest text-[10px] uppercase px-2 py-0.5 rounded bg-sand-gold/10 border border-sand-gold/20">FLAGSHIP</span>
+                <span id="bridge-vessel-name" class="text-sand-brightGold font-bold tracking-wide text-xs">L-OCEAN INTERNATIONAL</span>
+                <span class="text-sand-ecru/40">|</span>
+                <span id="bridge-command-status" class="text-sand-base font-semibold tracking-wide">ALL 4 TASK FORCE SQUADRONS STANDBY • READY FOR EXECUTIVE ORDERS</span>
+              </div>
+            </div>
+
+            <!-- Bridge Gyro & Clock Readout -->
+            <div class="flex items-center space-x-3 text-[10px] text-sand-ecru/60">
+              <span class="flex items-center space-x-1.5 text-emerald-400/90 font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                <span>SYSTEM ARMED</span>
+              </span>
+              <span>GRID: 21°N // PACIFIC PAC</span>
+            </div>
+          </div>
+
+          <!-- Bridge Instrument Panel: HEADING, ANCHORAGE, DEPLOYMENT, PROPULSION -->
+          <div class="px-6 sm:px-8 py-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 text-xs">
+            
+            <!-- 1. HEADING (사업의 방향성) -->
+            <div class="flex flex-col space-y-1.5 p-3 rounded-xl bg-makapuu-dark/60 border border-sand-gold/15">
+              <div class="flex items-center justify-between text-[10px] text-sand-gold font-semibold uppercase tracking-wider">
+                <span class="flex items-center space-x-1.5">
+                  <span class="text-emerald-400">▲</span>
+                  <span>HEADING</span>
+                </span>
+                <span class="text-sand-ecru/40 font-normal">COURSE</span>
+              </div>
+              <span id="hud-heading" class="text-white font-bold tracking-wide text-xs sm:text-[13px] leading-snug break-keep">
+                글로벌 부동산 &amp; 문화 자본의 영구적 결집
+              </span>
+            </div>
+
+            <!-- 2. ANCHORAGE (본사 위치 / 모항) -->
+            <div class="flex flex-col space-y-1.5 p-3 rounded-xl bg-makapuu-dark/60 border border-sand-gold/15">
+              <div class="flex items-center justify-between text-[10px] text-sand-gold font-semibold uppercase tracking-wider">
+                <span class="flex items-center space-x-1.5">
+                  <span class="text-sand-brightGold">⚓</span>
+                  <span>ANCHORAGE</span>
+                </span>
+                <span class="text-sand-ecru/40 font-normal">HOME BASE</span>
+              </div>
+              <span id="hud-anchorage" class="text-white font-bold tracking-wide text-xs sm:text-[13px] leading-snug">
+                HONOLULU APEX &bull; PACIFIC HEADQUARTERS
+              </span>
+            </div>
+
+            <!-- 3. DEPLOYMENT (주요 활동지 / 작전 해역) -->
+            <div class="flex flex-col space-y-1.5 p-3 rounded-xl bg-makapuu-dark/60 border border-sand-gold/15">
+              <div class="flex items-center justify-between text-[10px] text-sand-gold font-semibold uppercase tracking-wider">
+                <span class="flex items-center space-x-1.5">
+                  <span class="text-amber-300">●</span>
+                  <span>DEPLOYMENT</span>
+                </span>
+                <span class="text-sand-ecru/40 font-normal">OPERATIONS</span>
+              </div>
+              <span id="hud-deployment" class="text-white font-bold tracking-wider text-xs sm:text-[13px] leading-snug">
+                HNL, NYC, LAS, SEL, TYO, OSA, HKG, SIN
+              </span>
+            </div>
+
+            <!-- 4. PROPULSION (추진 동력 / 핵심 역량) -->
+            <div class="flex flex-col space-y-1.5 p-3 rounded-xl bg-makapuu-dark/60 border border-sand-gold/15">
+              <div class="flex items-center justify-between text-[10px] text-sand-gold font-semibold uppercase tracking-wider">
+                <span class="flex items-center space-x-1.5">
+                  <span class="text-pink-400">⚡</span>
+                  <span>PROPULSION</span>
+                </span>
+                <span class="text-sand-ecru/40 font-normal">ENGINE</span>
+              </div>
+              <span id="hud-propulsion" class="text-white font-bold tracking-wide text-xs sm:text-[13px] leading-snug">
+                대지 자산 &bull; 미학 큐레이션 &bull; 메가 IP 펀드 &bull; 나이트라이프
+              </span>
+            </div>
+
+          </div>
+
+          <!-- Bottom Console Status Line -->
+          <div class="px-6 sm:px-8 py-2 bg-makapuu-dark/40 border-t border-sand-gold/10 flex items-center justify-between text-[10px] text-sand-ecru/50">
+            <span class="tracking-widest">BRIDGE COMMAND PROTOCOL // LEVEL 04 CLEARED</span>
+            <span class="text-sand-gold tracking-wider">HOVER FLEET CARD TO TRANSMIT SQUADRON TELEMETRY</span>
+          </div>
+
+        </div>
+
+        <!-- 3D POP-UP FLEET BRIDGES: 4대 핵심 사업 카드 (4열 최적화 그리드) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch mb-16">
+          
+          <!-- Card 01: JOSIAH LIGHTHOUSE (글로벌 부동산 개발) -->
+          <div id="card-module-1" 
+               onmouseenter="setGridMode('realestate')" 
+               onmouseleave="resetGridMode()" 
+               onclick="openBusinessDetailModal(1)"
+               class="group relative rounded-3xl bg-gradient-to-b from-makapuu-deep/95 via-makapuu-dark/95 to-makapuu-night/95 border border-sand-gold/30 hover:border-amber-400 transition-all duration-500 hover:-translate-y-5 hover:scale-[1.04] hover:z-30 hover:shadow-[0_25px_60px_rgba(223,192,143,0.35)] flex flex-col justify-between overflow-hidden backdrop-blur-2xl cursor-pointer">
+            
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-sand-brightGold rounded-tl-2xl pointer-events-none z-20"></div>
+            <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-sand-brightGold rounded-tr-2xl pointer-events-none z-20"></div>
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/20 rounded-full blur-2xl group-hover:bg-amber-400/35 transition-all pointer-events-none"></div>
+
+            <div>
+              <!-- Visual -->
+              <div class="relative h-48 sm:h-52 w-full overflow-hidden border-b border-sand-gold/20 bg-makapuu-night">
+                <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80" 
+                     alt="JOSIAH LIGHTHOUSE - Real Estate Development" 
+                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-makapuu-deep via-makapuu-deep/30 to-transparent"></div>
+                
+                <div class="absolute top-3.5 left-3.5 flex items-center space-x-2 z-10">
+                  <span class="px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-amber-400/60 text-[9px] font-mono tracking-widest text-amber-300 uppercase backdrop-blur-md shadow-lg font-bold">
+                    DIV 01 &bull; LAND
+                  </span>
+                </div>
+                <div class="absolute top-3.5 right-3.5 z-10">
+                  <span class="w-7 h-7 rounded-full bg-makapuu-dark/90 border border-amber-400/50 flex items-center justify-center text-[10px] text-amber-300 font-mono group-hover:rotate-45 transition-transform duration-500 shadow-md">
+                    ↗
+                  </span>
+                </div>
+
+                <div class="absolute bottom-2.5 left-4 right-4 flex justify-between items-end z-10">
+                  <span class="text-[9px] font-mono tracking-wider text-sand-gold/90 uppercase bg-makapuu-dark/90 px-2 py-0.5 rounded border border-sand-gold/30">
+                    8 GLOBAL AXIS
+                  </span>
+                  <span class="text-[10px] font-mono text-amber-300 font-bold">TROPHY ASSET</span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between pb-2 border-b border-sand-gold/20 mb-3">
+                  <span class="text-[10px] font-mono tracking-widest text-amber-400 font-bold uppercase">01 / REAL ESTATE</span>
+                  <span class="text-[10px] font-mono text-sand-ecru/50">EST. 1991</span>
+                </div>
+
+                <h4 class="font-serif text-lg sm:text-xl lg:text-2xl text-sand-base font-bold mb-1.5 group-hover:text-amber-300 transition-colors tracking-tight leading-snug">
+                  JOSIAH LIGHTHOUSE
+                </h4>
+                <span class="font-kr text-xs font-semibold text-sand-brightGold block mb-3">
+                  글로벌 부동산 개발
+                </span>
+
+                <!-- Cities Grid -->
+                <div class="flex flex-wrap gap-1 pt-1">
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">하와이</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">뉴욕</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">라스베이거스</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">도쿄</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">오사카</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">서울</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">홍콩</span>
+                  <span class="px-1.5 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-[9px] font-mono text-amber-200">싱가포르</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-makapuu-night/90 border-t border-sand-gold/20 flex items-center justify-between text-[10px] font-mono text-sand-ecru/75">
+              <span class="flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                <span class="uppercase tracking-wider font-medium text-amber-300">LAND ASSEMBLY</span>
+              </span>
+              <span class="text-amber-400 font-bold group-hover:translate-x-1 transition-transform">DETAILS ↗</span>
+            </div>
+          </div>
+
+          <!-- Card 02: OCEAN HEARTS (뷰티, 패션, 공간 브랜딩) -->
+          <div id="card-module-2" 
+               onmouseenter="setGridMode('oceanhearts')" 
+               onmouseleave="resetGridMode()" 
+               onclick="openBusinessDetailModal(2)"
+               class="group relative rounded-3xl bg-gradient-to-b from-makapuu-deep/95 via-makapuu-dark/95 to-makapuu-night/95 border border-sand-gold/30 hover:border-emerald-400 transition-all duration-500 hover:-translate-y-5 hover:scale-[1.04] hover:z-30 hover:shadow-[0_25px_60px_rgba(52,211,153,0.35)] flex flex-col justify-between overflow-hidden backdrop-blur-2xl cursor-pointer">
+            
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-emerald-400 rounded-tl-2xl pointer-events-none z-20"></div>
+            <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-emerald-400 rounded-tr-2xl pointer-events-none z-20"></div>
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-emerald-500/20 rounded-full blur-2xl group-hover:bg-emerald-400/35 transition-all pointer-events-none"></div>
+
+            <div>
+              <!-- Visual -->
+              <div class="relative h-48 sm:h-52 w-full overflow-hidden border-b border-sand-gold/20 bg-makapuu-night">
+                <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80" 
+                     alt="OCEAN HEARTS - Beauty, Fashion & Space Branding" 
+                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-makapuu-deep via-emerald-950/25 to-transparent"></div>
+                
+                <div class="absolute top-3.5 left-3.5 flex items-center space-x-2 z-10">
+                  <span class="px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-emerald-400/60 text-[9px] font-mono tracking-widest text-emerald-300 uppercase backdrop-blur-md shadow-lg font-bold">
+                    DIV 02 &bull; BRANDING
+                  </span>
+                </div>
+                <div class="absolute top-3.5 right-3.5 z-10">
+                  <span class="w-7 h-7 rounded-full bg-makapuu-dark/90 border border-emerald-400/50 flex items-center justify-center text-[10px] text-emerald-300 font-mono group-hover:rotate-45 transition-transform duration-500 shadow-md">
+                    ↗
+                  </span>
+                </div>
+
+                <div class="absolute bottom-2.5 left-4 right-4 flex justify-between items-end z-10">
+                  <span class="text-[9px] font-mono tracking-wider text-emerald-300 uppercase bg-makapuu-dark/90 px-2 py-0.5 rounded border border-emerald-400/30">
+                    LUXURY ATELIER
+                  </span>
+                  <span class="text-[10px] font-mono text-emerald-300 font-bold">HAUTE COUTURE</span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between pb-2 border-b border-sand-gold/20 mb-3">
+                  <span class="text-[10px] font-mono tracking-widest text-emerald-400 font-bold uppercase">02 / BRANDING &amp; BEAUTY</span>
+                  <span class="text-[10px] font-mono text-sand-ecru/50">ATELIER</span>
+                </div>
+
+                <h4 class="font-serif text-xl sm:text-2xl text-sand-base font-bold mb-1 group-hover:text-emerald-300 transition-colors tracking-tight leading-tight">
+                  OCEAN HEARTS
+                </h4>
+                <span class="font-kr text-xs font-semibold text-emerald-300 block mb-3">
+                  뷰티 &bull; 패션 &bull; 공간 브랜딩
+                </span>
+
+                <!-- Category Tags -->
+                <div class="flex flex-wrap gap-1 pt-1">
+                  <span class="px-2 py-0.5 rounded bg-emerald-400/10 border border-emerald-400/30 text-[9px] font-mono text-emerald-200">하이엔드 뷰티</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-400/10 border border-emerald-400/30 text-[9px] font-mono text-emerald-200">럭셔리 패션</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-400/10 border border-emerald-400/30 text-[9px] font-mono text-emerald-200">공간 브랜딩</span>
+                  <span class="px-2 py-0.5 rounded bg-emerald-400/10 border border-emerald-400/30 text-[9px] font-mono text-emerald-200">플래그십 아키텍처</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-makapuu-night/90 border-t border-sand-gold/20 flex items-center justify-between text-[10px] font-mono text-sand-ecru/75">
+              <span class="flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="uppercase tracking-wider font-medium text-emerald-300">CURATION ACTIVE</span>
+              </span>
+              <span class="text-emerald-400 font-bold group-hover:translate-x-1 transition-transform">DETAILS ↗</span>
+            </div>
+          </div>
+
+          <!-- Card 03: SEOUL LINE (콘텐츠 투자펀드 - K-POP 콘서트 & 스타디움 비주얼) -->
+          <div id="card-module-3" 
+               onmouseenter="setGridMode('seoulline')" 
+               onmouseleave="resetGridMode()" 
+               onclick="openBusinessDetailModal(3)"
+               class="group relative rounded-3xl bg-gradient-to-b from-makapuu-deep/95 via-makapuu-dark/95 to-makapuu-night/95 border border-sand-gold/30 hover:border-violet-400 transition-all duration-500 hover:-translate-y-5 hover:scale-[1.04] hover:z-30 hover:shadow-[0_25px_60px_rgba(167,139,250,0.35)] flex flex-col justify-between overflow-hidden backdrop-blur-2xl cursor-pointer">
+            
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-violet-400 rounded-tl-2xl pointer-events-none z-20"></div>
+            <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-violet-400 rounded-tr-2xl pointer-events-none z-20"></div>
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-violet-600/20 rounded-full blur-2xl group-hover:bg-violet-500/35 transition-all pointer-events-none"></div>
+
+            <div>
+              <!-- Visual (K-POP & Global Stadium Arena) -->
+              <div class="relative h-48 sm:h-52 w-full overflow-hidden border-b border-sand-gold/20 bg-makapuu-night">
+                <img src="https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=800&q=80" 
+                     alt="SEOUL LINE - K-POP Global Concert & Media Fund" 
+                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-makapuu-deep via-violet-950/30 to-transparent"></div>
+                
+                <div class="absolute top-3.5 left-3.5 flex items-center space-x-2 z-10">
+                  <span class="px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-violet-400/60 text-[9px] font-mono tracking-widest text-violet-300 uppercase backdrop-blur-md shadow-lg font-bold">
+                    DIV 03 &bull; CAPITAL
+                  </span>
+                </div>
+                <div class="absolute top-3.5 right-3.5 z-10">
+                  <span class="w-7 h-7 rounded-full bg-makapuu-dark/90 border border-violet-400/50 flex items-center justify-center text-[10px] text-violet-300 font-mono group-hover:rotate-45 transition-transform duration-500 shadow-md">
+                    ↗
+                  </span>
+                </div>
+
+                <div class="absolute bottom-2.5 left-4 right-4 flex justify-between items-end z-10">
+                  <span class="text-[9px] font-mono tracking-wider text-violet-300 uppercase bg-makapuu-dark/90 px-2 py-0.5 rounded border border-violet-400/30">
+                    K-POP &bull; GLOBAL IP
+                  </span>
+                  <span class="text-[10px] font-mono text-violet-300 font-bold">MEGA FUND</span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between pb-2 border-b border-sand-gold/20 mb-3">
+                  <span class="text-[10px] font-mono tracking-widest text-violet-400 font-bold uppercase">03 / INVESTMENT FUND</span>
+                  <span class="text-[10px] font-mono text-sand-ecru/50">MEDIA CAPITAL</span>
+                </div>
+
+                <h4 class="font-serif text-xl sm:text-2xl text-sand-base font-bold mb-1 group-hover:text-violet-300 transition-colors tracking-tight leading-tight">
+                  SEOUL LINE
+                </h4>
+                <span class="font-kr text-xs font-semibold text-violet-300 block mb-3">
+                  콘텐츠 투자펀드
+                </span>
+
+                <!-- Category Tags -->
+                <div class="flex flex-wrap gap-1 pt-1">
+                  <span class="px-2 py-0.5 rounded bg-violet-400/10 border border-violet-400/30 text-[9px] font-mono text-violet-200">K-POP 글로벌 투어</span>
+                  <span class="px-2 py-0.5 rounded bg-violet-400/10 border border-violet-400/30 text-[9px] font-mono text-violet-200">영화 &bull; 시리즈 IP</span>
+                  <span class="px-2 py-0.5 rounded bg-violet-400/10 border border-violet-400/30 text-[9px] font-mono text-violet-200">미디어 아트</span>
+                  <span class="px-2 py-0.5 rounded bg-violet-400/10 border border-violet-400/30 text-[9px] font-mono text-violet-200">엔터테인먼트 펀드</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-makapuu-night/90 border-t border-sand-gold/20 flex items-center justify-between text-[10px] font-mono text-sand-ecru/75">
+              <span class="flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse"></span>
+                <span class="uppercase tracking-wider font-medium text-violet-300">FUND ACTIVE</span>
+              </span>
+              <span class="text-violet-400 font-bold group-hover:translate-x-1 transition-transform">DETAILS ↗</span>
+            </div>
+          </div>
+
+          <!-- Card 04: Coral LLC (나이트클럽, 프로듀싱) -->
+          <div id="card-module-4" 
+               onmouseenter="setGridMode('coral')" 
+               onmouseleave="resetGridMode()" 
+               onclick="openBusinessDetailModal(4)"
+               class="group relative rounded-3xl bg-gradient-to-b from-makapuu-deep/95 via-makapuu-dark/95 to-makapuu-night/95 border border-sand-gold/30 hover:border-pink-500 transition-all duration-500 hover:-translate-y-5 hover:scale-[1.04] hover:z-30 hover:shadow-[0_25px_60px_rgba(236,72,153,0.35)] flex flex-col justify-between overflow-hidden backdrop-blur-2xl cursor-pointer">
+            
+            <div class="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-pink-400 rounded-tl-2xl pointer-events-none z-20"></div>
+            <div class="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-pink-400 rounded-tr-2xl pointer-events-none z-20"></div>
+            <div class="absolute -top-10 -right-10 w-24 h-24 bg-pink-600/20 rounded-full blur-2xl group-hover:bg-pink-500/35 transition-all pointer-events-none"></div>
+
+            <div>
+              <!-- Visual -->
+              <div class="relative h-48 sm:h-52 w-full overflow-hidden border-b border-sand-gold/20 bg-makapuu-night">
+                <img src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80" 
+                     alt="Coral LLC - Nightclub & Producing" 
+                     class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 opacity-90 group-hover:opacity-100">
+                <div class="absolute inset-0 bg-gradient-to-t from-makapuu-deep via-pink-950/25 to-transparent"></div>
+                
+                <div class="absolute top-3.5 left-3.5 flex items-center space-x-2 z-10">
+                  <span class="px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-pink-400/60 text-[9px] font-mono tracking-widest text-pink-300 uppercase backdrop-blur-md shadow-lg font-bold">
+                    DIV 04 &bull; NIGHTLIFE
+                  </span>
+                </div>
+                <div class="absolute top-3.5 right-3.5 z-10">
+                  <span class="w-7 h-7 rounded-full bg-makapuu-dark/90 border border-pink-400/50 flex items-center justify-center text-[10px] text-pink-300 font-mono group-hover:rotate-45 transition-transform duration-500 shadow-md">
+                    ↗
+                  </span>
+                </div>
+
+                <div class="absolute bottom-2.5 left-4 right-4 flex justify-between items-end z-10">
+                  <span class="text-[9px] font-mono tracking-wider text-pink-300 uppercase bg-makapuu-dark/90 px-2 py-0.5 rounded border border-pink-400/30">
+                    4 NOCTURNAL HUBS
+                  </span>
+                  <span class="text-[10px] font-mono text-pink-300 font-bold">PRODUCING</span>
+                </div>
+              </div>
+
+              <!-- Content -->
+              <div class="p-5 sm:p-6">
+                <div class="flex items-center justify-between pb-2 border-b border-sand-gold/20 mb-3">
+                  <span class="text-[10px] font-mono tracking-widest text-pink-400 font-bold uppercase">04 / NIGHTLIFE &amp; MUSIC</span>
+                  <span class="text-[10px] font-mono text-sand-ecru/50">PRODUCING</span>
+                </div>
+
+                <h4 class="font-serif text-xl sm:text-2xl text-sand-base font-bold mb-1 group-hover:text-pink-300 transition-colors tracking-tight leading-tight">
+                  Coral LLC
+                </h4>
+                <span class="font-kr text-xs font-semibold text-pink-300 block mb-3">
+                  나이트클럽 &bull; 프로듀싱
+                </span>
+
+                <!-- 4 Cities Grid -->
+                <div class="flex flex-wrap gap-1 pt-1">
+                  <span class="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-400/40 text-[9px] font-mono text-pink-200 font-semibold">도쿄 (Tokyo)</span>
+                  <span class="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-400/40 text-[9px] font-mono text-pink-200 font-semibold">홍콩 (Hong Kong)</span>
+                  <span class="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-400/40 text-[9px] font-mono text-pink-200 font-semibold">뉴욕 (New York)</span>
+                  <span class="px-2 py-0.5 rounded bg-pink-500/15 border border-pink-400/40 text-[9px] font-mono text-pink-200 font-semibold">서울 (Seoul)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-3 bg-makapuu-night/90 border-t border-sand-gold/20 flex items-center justify-between text-[10px] font-mono text-sand-ecru/75">
+              <span class="flex items-center space-x-1.5">
+                <span class="w-1.5 h-1.5 rounded-full bg-pink-400 animate-pulse"></span>
+                <span class="uppercase tracking-wider font-medium text-pink-300">CLUBS IN SESSION</span>
+              </span>
+              <span class="text-pink-400 font-bold group-hover:translate-x-1 transition-transform">DETAILS ↗</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Ambient Breaking Wave Whitecap Foam & Surf Spray Backdrop Canvas -->
+      <div class="absolute bottom-0 left-0 w-full h-44 pointer-events-none z-[2] overflow-hidden">
+        <canvas id="scroll-wave-foam-canvas" class="w-full h-full opacity-60"></canvas>
+        <div class="absolute inset-0 bg-gradient-to-t from-makapuu-night via-transparent to-transparent pointer-events-none"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         PAGE 3: THE COMPASS (천체 아스트롤라베 나침반 & 철학적 서사)
+         ========================================================== -->
+    <section id="compass-heritage" class="pt-16 pb-24 px-6 border-b sand-border bg-gradient-to-b from-makapuu-night via-makapuu-dark to-makapuu-night relative overflow-hidden">
+      <div class="max-w-7xl mx-auto relative z-10">
+        
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-14">
+          <div class="inline-flex items-center space-x-3 mb-4 px-4 py-1.5 rounded-full bg-makapuu-deep/80 border border-sand-gold/30">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-pulse"></span>
+            <span class="text-sand-brightGold font-serif italic text-sm sm:text-base whitespace-nowrap">2. The Celestial Compass</span>
+            <span class="w-4 h-[1px] bg-sand-gold/40"></span>
+            <span class="text-[10px] uppercase tracking-[0.28em] font-mono text-sand-ecru/70 whitespace-nowrap">Heritage Navigation</span>
+          </div>
+          <h2 class="font-serif text-3xl sm:text-5xl text-sand-base font-normal tracking-tight mb-4">
+            The Astrolabe of Absolute Horizons
+          </h2>
+          <p class="font-kr text-sand-ecru/80 text-xs sm:text-sm font-light leading-relaxed break-keep">
+            엘오션인터내셔널의 상징인 ‘황금 아스트롤라베(The Golden Astrolabe)’는 유행에 흔들리지 않는 본질적인 지혜를 의미합니다.<br>이 나침반에는 엘오션인터내셔널의 5대 항해 철학을 내포하고 있습니다.<br>
+            묵묵히 바다를 나아가는 <strong class="font-semibold text-sand-brightGold">시스템</strong>을 상징하는 북쪽(Vessel), <strong class="font-semibold text-sand-brightGold">과감함과 도전</strong>을 상징하는 남쪽(Board),<br>시대의 흐름을 읽는<strong class="font-semibold text-sand-brightGold">예리한 통찰력</strong>을 상징하는 동쪽(선구안), <strong class="font-semibold text-sand-brightGold">영속적인 회복탄력성</strong>을 상징하는 서쪽(회복)이<br>하나의 온전한 나침반을 완성합니다.
+          </p>
+        </div>
+
+        <!-- Central Aligned Compass Container -->
+        <div class="flex flex-col items-center justify-center max-w-4xl mx-auto">
+          
+          <!-- Gyroscopic Astrolabe Compass Viewport (Center) -->
+          <div class="flex flex-col items-center justify-center relative">
+
+            <div id="compass-interactive" class="compass-container relative w-72 h-72 sm:w-96 sm:h-96 rounded-full border border-sand-gold/30 bg-makapuu-deep/80 backdrop-blur-md flex items-center justify-center compass-astrolabe-glow cursor-crosshair group overflow-visible">
+              
+              <!-- Radiant Dynamic Golden Halo Backdrop -->
+              <div id="compass-halo" class="compass-golden-halo"></div>
+
+              <!-- Sparkle particles canvas (Expanded & Unclipped) -->
+              <canvas id="compass-sparkle-canvas"></canvas>
+
+              <!-- Radial Pulse Ring -->
+              <div id="compass-pulse-ring" class="absolute inset-0 rounded-full border border-sand-gold/30 compass-pulse-ring pointer-events-none transition-colors duration-300"></div>
+
+              <!-- Outer Astrolabe Ring -->
+              <div id="compass-outer-ring" class="compass-ring-outer absolute inset-3 rounded-full border border-sand-gold/40 flex items-center justify-center pointer-events-none">
+                <svg viewBox="0 0 400 400" class="w-full h-full text-sand-gold/60">
+                  <circle cx="200" cy="200" r="190" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="2 6"/>
+                  <circle cx="200" cy="200" r="175" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                  <!-- Degree marks -->
+                  <g opacity="0.75" stroke="currentColor" stroke-width="1">
+                    <line x1="200" y1="10" x2="200" y2="25"/>
+                    <line x1="200" y1="375" x2="200" y2="390"/>
+                    <line x1="10" y1="200" x2="25" y2="200"/>
+                    <line x1="375" y1="200" x2="390" y2="200"/>
+                    <line x1="65" y1="65" x2="76" y2="76"/>
+                    <line x1="335" y1="335" x2="324" y2="324"/>
+                    <line x1="335" y1="65" x2="324" y2="76"/>
+                    <line x1="65" y1="335" x2="76" y2="324"/>
+                  </g>
+                  <!-- Cardinal labels with Philosophy Subtext -->
+                  <g id="cardinal-group">
+                    <text x="200" y="44" font-family="'Cormorant Garamond', serif" font-size="18" fill="#DFC08F" text-anchor="middle" font-weight="600">N</text>
+                    <text x="200" y="370" font-family="'Cormorant Garamond', serif" font-size="18" fill="#DFC08F" text-anchor="middle" font-weight="600">S</text>
+                    <text x="366" y="206" font-family="'Cormorant Garamond', serif" font-size="18" fill="#DFC08F" text-anchor="middle" font-weight="600">E</text>
+                    <text x="34" y="206" font-family="'Cormorant Garamond', serif" font-size="18" fill="#DFC08F" text-anchor="middle" font-weight="600">W</text>
+                  </g>
+                </svg>
+              </div>
+
+              <!-- Inner Astrolabe Ring -->
+              <div id="compass-inner-ring" class="compass-ring-inner absolute inset-12 sm:inset-16 rounded-full border border-sand-gold/25 flex items-center justify-center pointer-events-none">
+                <svg viewBox="0 0 260 260" class="w-full h-full text-sand-gold/40">
+                  <circle cx="130" cy="130" r="120" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 4"/>
+                  <polygon points="130,20 138,122 240,130 138,138 130,240 122,138 20,130 122,122" fill="none" stroke="currentColor" stroke-width="0.8" opacity="0.6"/>
+                </svg>
+              </div>
+
+              <!-- Gyroscopic Needle Pivot with Radiant Golden Star Flare -->
+              <div id="compass-needle" class="compass-needle relative w-full h-full flex items-center justify-center pointer-events-none z-20">
+                <svg viewBox="0 0 100 100" class="w-48 h-48 sm:w-64 sm:h-64 filter drop-shadow-[0_0_18px_rgba(255,226,159,0.85)]">
+                  <!-- Golden Flare Rays Behind Needle -->
+                  <circle cx="50" cy="18" r="16" fill="url(#goldenFlareGradient)" opacity="0.75" class="needle-flare"/>
+                  <defs>
+                    <radialGradient id="goldenFlareGradient" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#FFF5D6" stop-opacity="1"/>
+                      <stop offset="35%" stop-color="#DFC08F" stop-opacity="0.8"/>
+                      <stop offset="100%" stop-color="#DFC08F" stop-opacity="0"/>
+                    </radialGradient>
+                    <linearGradient id="goldNeedleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stop-color="#FFF8E7"/>
+                      <stop offset="45%" stop-color="#FFE29F"/>
+                      <stop offset="85%" stop-color="#C5A676"/>
+                      <stop offset="100%" stop-color="#8C6834"/>
+                    </linearGradient>
+                  </defs>
+                  <!-- North pointer (Radiant Solid 24K Gold) -->
+                  <polygon points="50,4 56,50 50,43 44,50" fill="url(#goldNeedleGradient)" stroke="#FFFFFF" stroke-width="0.6"/>
+                  <!-- North pointer highlight edge -->
+                  <polygon points="50,4 50,43 44,50" fill="#FFFFFF" opacity="0.35"/>
+                  <!-- South pointer (Dark Makapu'u Slate with Bronze rim) -->
+                  <polygon points="50,96 56,50 50,57 44,50" fill="#162A45" stroke="#C5A676" stroke-width="0.5"/>
+                  <!-- South pointer dark facet -->
+                  <polygon points="50,96 50,57 44,50" fill="#0A1420" opacity="0.45"/>
+                  <!-- Center Jewel with Gold Halo -->
+                  <circle cx="50" cy="50" r="7" fill="none" stroke="#FFE29F" stroke-width="1.2" opacity="0.8"/>
+                  <circle cx="50" cy="50" r="4.8" fill="#FFF8E7" stroke="#DFC08F" stroke-width="1.6"/>
+                  <circle cx="50" cy="50" r="1.8" fill="#0A1420"/>
+                </svg>
+              </div>
+
+              <!-- Center Coordinates Stamp -->
+              <div class="absolute bottom-6 font-mono text-[9px] tracking-widest text-sand-gold/70 uppercase pointer-events-none">
+                L-OCEAN CELESTIAL PROTOCOL
+              </div>
+            </div>
+
+            <!-- Compass Live Telemetry readout (Centered) -->
+            <div class="mt-8 flex flex-wrap items-center justify-center gap-4 sm:gap-8 font-mono text-xs text-sand-ecru/70">
+              <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-sand-brightGold"></span>
+                <span class="text-sand-gold">AZIMUTH:</span>
+                <span id="compass-azimuth-val" class="text-sand-base font-semibold">000.0° N</span>
+              </div>
+              <div class="flex items-center space-x-2">
+                <span class="text-sand-gold">PHILOSOPHY:</span>
+                <span id="compass-target-val" class="text-sand-brightGold font-semibold font-kr">북(北) : VESSEL — 거대한 함선의 대지 주권</span>
+              </div>
+            </div>
+          </div>
+
+        <!-- Compass Narrative Context (Centered Below Compass with Golden Ratio Balance) -->
+        <div class="w-full max-w-3xl mt-14 sm:mt-16">
+          <div class="p-8 sm:p-12 rounded-3xl bg-makapuu-deep/90 border border-sand-gold/30 backdrop-blur-xl text-center shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
+            
+            <div class="flex items-center justify-center space-x-3 mb-4">
+              <span class="w-6 h-[1px] bg-sand-gold/40"></span>
+              <span class="text-[11px] font-mono uppercase tracking-[0.28em] text-sand-gold font-semibold">
+                THE WAYFINDER PRINCIPLE
+              </span>
+              <span class="w-6 h-[1px] bg-sand-gold/40"></span>
+            </div>
+
+            <!-- New Elegant Serif Title with Golden Ratio Typography -->
+            <h3 class="font-serif text-3xl sm:text-4xl md:text-5xl text-sand-base mb-6 font-light tracking-tight leading-[1.25]">
+              True Bearing, <span class="italic text-sand-brightGold font-normal">Infinite Essence.</span>
+            </h3>
+
+            <!-- Balanced Sentences with Bold Accents and Golden Proportions -->
+            <div class="space-y-4 max-w-2xl mx-auto text-left sm:text-center">
+              <p class="font-kr text-sand-ecru/85 text-sm sm:text-[15px] font-light leading-[1.8] break-keep">
+                고대 폴리네시아의 항해자들은 지도 한 장 없이,<br><strong class="font-bold text-sand-base">오직 바다의 너울과 별자리의 각도</strong>만으로 거대한 대양을 건너 미지의 대지에 도달했습니다.
+              </p>
+
+              <p class="font-kr text-sand-ecru/85 text-sm sm:text-[15px] font-light leading-[1.8] break-keep">
+                엘오션인터내셔널은 파도의 이치를 꿰뚫는 통찰과 흔들리지 않는 장인정신으로,<br>시대를 초월해 영구적인 가치를 지닐 단 하나의 거점을 향해 흔들림 없이 나아갑니다.
+              </p>
+            </div>
+            
+            <div class="mt-8 pt-6 border-t border-sand-gold/20 flex items-center justify-between text-xs font-mono text-sand-gold/80 max-w-md mx-auto">
+              <span>SECTOR 02 // BEARING LOCKED</span>
+              <span>4 PHILOSOPHICAL AXES ACTIVE</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         PAGE 4: WORLDVIEW (황금 아스트롤라베의 5대 항해 원칙 & 혹등고래 3D 캐러셀)
+         ========================================================== -->
+    <section id="worldview" class="py-24 sm:py-32 px-6 border-b sand-border bg-makapuu-dark relative overflow-hidden">
+      <!-- Background Whale Breaching Canvas -->
+      <canvas id="worldview-whale-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-40"></canvas>
+      <div class="absolute inset-0 bg-gradient-to-b from-makapuu-night/90 via-transparent to-makapuu-night/95 pointer-events-none z-[1]"></div>
+
+      <div class="max-w-7xl mx-auto relative z-10">
+        
+        <!-- Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="inline-flex items-center space-x-3 mb-4 px-4 py-1.5 rounded-full bg-makapuu-deep/80 border border-sand-gold/30">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-pulse"></span>
+            <span class="text-sand-brightGold font-serif italic text-sm sm:text-base whitespace-nowrap">3. The 5 Navigational Principles</span>
+            <span class="w-4 h-[1px] bg-sand-gold/40"></span>
+            <span class="text-[10px] uppercase tracking-[0.28em] font-mono text-sand-ecru/70 whitespace-nowrap">Sacred Worldview</span>
+          </div>
+          <h2 class="font-serif text-3xl sm:text-5xl text-sand-base font-normal tracking-tight mb-4">
+            The Quintessence of the Oceanic Axis
+          </h2>
+          <p class="font-kr text-sand-ecru/80 text-xs sm:text-sm font-light leading-relaxed break-keep">
+            황금 아스트롤라베가 가리키는 동서남북 4방위와 중심축—엘오션인터내셔널이 영구적으로 지켜나가는 5대 사업 철학입니다.
+          </p>
+        </div>
+
+        <!-- 3D Cylindrical Wave Orbit Carousel Stage -->
+        <div id="vortex-interactive-zone" class="vortex-stage relative w-full h-[520px] sm:h-[580px] flex items-center justify-center overflow-visible select-none">
+          
+          <!-- Background Wave Lines Canvas -->
+          <canvas id="vortex-waves-canvas"></canvas>
+
+          <!-- Rotating Cylindrical Carousel Track -->
+          <div id="vortex-track" class="vortex-track relative w-full h-full flex items-center justify-center">
+            
+            <!-- Card 01: NORTH (Vessel - 대지 주권) -->
+            <div class="wave-node-card absolute w-[290px] sm:w-[350px] p-6 rounded-3xl bg-makapuu-deep/95 border border-sand-gold/40 backdrop-blur-xl shadow-2xl cursor-pointer" onclick="selectVortexNode(0)">
+              <div class="wave-card-img-wrap h-40 sm:h-44 w-full mb-4 border border-sand-gold/25">
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" alt="NORTH - Vessel" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-sand-gold/50 text-[9px] font-mono text-sand-brightGold font-bold">
+                  N &bull; VESSEL
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-sand-gold tracking-widest uppercase block">PRINCIPLE 01 // NORTH</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-sand-base font-medium">영구적 대지 주권</h3>
+                <p class="font-kr text-sand-ecru/75 text-xs font-light leading-relaxed break-keep">
+                  거대한 선체(Vessel)처럼 어떤 풍랑에도 침몰하지 않는 대지 주권을 선제적으로 영구 매입하여 불변의 자산 가치를 확보합니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Card 02: EAST (선구안 - 감각적 미학) -->
+            <div class="wave-node-card absolute w-[290px] sm:w-[350px] p-6 rounded-3xl bg-makapuu-deep/95 border border-sand-gold/40 backdrop-blur-xl shadow-2xl cursor-pointer" onclick="selectVortexNode(1)">
+              <div class="wave-card-img-wrap h-40 sm:h-44 w-full mb-4 border border-sand-gold/25">
+                <img src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&w=800&q=80" alt="EAST - Vision" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-emerald-400/60 text-[9px] font-mono text-emerald-300 font-bold">
+                  E &bull; 선구안
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-emerald-300 tracking-widest uppercase block">PRINCIPLE 02 // EAST</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-sand-base font-medium">감각적 미학 큐레이션</h3>
+                <p class="font-kr text-sand-ecru/75 text-xs font-light leading-relaxed break-keep">
+                  여명 너머 본질을 꿰뚫는 선구안으로 뷰티, 패션, 공간 건축 전반에 타협 없는 감각적 하이엔드 기준을 세웁니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Card 03: SOUTH (Board - 문화 자본과 추진력) -->
+            <div class="wave-node-card absolute w-[290px] sm:w-[350px] p-6 rounded-3xl bg-makapuu-deep/95 border border-sand-gold/40 backdrop-blur-xl shadow-2xl cursor-pointer" onclick="selectVortexNode(2)">
+              <div class="wave-card-img-wrap h-40 sm:h-44 w-full mb-4 border border-sand-gold/25">
+                <img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=800&q=80" alt="SOUTH - Board" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-violet-400/60 text-[9px] font-mono text-violet-300 font-bold">
+                  S &bull; BOARD
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-violet-300 tracking-widest uppercase block">PRINCIPLE 03 // SOUTH</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-sand-base font-medium">문화 자본 &amp; 메가 IP</h3>
+                <p class="font-kr text-sand-ecru/75 text-xs font-light leading-relaxed break-keep">
+                  거센 파도를 타는 보드(Board)처럼 과감한 실행력으로 K-POP과 글로벌 미디어 IP 펀드를 지휘하며 전 세계적인 파급력을 창출합니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Card 04: WEST (회복 - 잠들지 않는 생태계) -->
+            <div class="wave-node-card absolute w-[290px] sm:w-[350px] p-6 rounded-3xl bg-makapuu-deep/95 border border-sand-gold/40 backdrop-blur-xl shadow-2xl cursor-pointer" onclick="selectVortexNode(3)">
+              <div class="wave-card-img-wrap h-40 sm:h-44 w-full mb-4 border border-sand-gold/25">
+                <img src="https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&w=800&q=80" alt="WEST - Renewal" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-pink-400/60 text-[9px] font-mono text-pink-300 font-bold">
+                  W &bull; 회복
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-pink-300 tracking-widest uppercase block">PRINCIPLE 04 // WEST</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-sand-base font-medium">잠들지 않는 나이트라이프</h3>
+                <p class="font-kr text-sand-ecru/75 text-xs font-light leading-relaxed break-keep">
+                  황혼 너머 밤을 지배하고 끊임없이 다시 피어나는 회복탄력성으로 4대 메가시티의 하이퍼 클럽과 사운드 생태계를 장악합니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- Card 05: CENTER (영속성 - 100년 유산) -->
+            <div class="wave-node-card absolute w-[290px] sm:w-[350px] p-6 rounded-3xl bg-makapuu-deep/95 border border-sand-gold/40 backdrop-blur-xl shadow-2xl cursor-pointer" onclick="selectVortexNode(4)">
+              <div class="wave-card-img-wrap h-40 sm:h-44 w-full mb-4 border border-sand-gold/25">
+                <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80" alt="CENTER - Legacy" class="w-full h-full object-cover">
+                <div class="absolute top-3 left-3 px-2.5 py-0.5 rounded-full bg-makapuu-night/90 border border-sand-brightGold/70 text-[9px] font-mono text-sand-brightGold font-bold">
+                  CENTER &bull; AXIS
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <span class="text-[10px] font-mono text-sand-brightGold tracking-widest uppercase block">PRINCIPLE 05 // CENTER</span>
+                <h3 class="font-serif text-xl sm:text-2xl text-sand-base font-medium">100년 유산의 영속성</h3>
+                <p class="font-kr text-sand-ecru/75 text-xs font-light leading-relaxed break-keep">
+                  4개 방위의 합일점으로서, 세월의 풍화에도 마모되지 않는 천연 석재와 최고급 건축 공학으로 가문의 영구적 유산을 완성합니다.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Left / Right Carousel Controls -->
+          <button onclick="rotateVortexWave(-1)" class="absolute left-2 sm:left-6 z-30 w-11 h-11 rounded-full bg-makapuu-night/90 border border-sand-gold/40 text-sand-brightGold hover:bg-sand-gold hover:text-makapuu-night flex items-center justify-center transition-all shadow-xl">
+            ←
+          </button>
+          <button onclick="rotateVortexWave(1)" class="absolute right-2 sm:right-6 z-30 w-11 h-11 rounded-full bg-makapuu-night/90 border border-sand-gold/40 text-sand-brightGold hover:bg-sand-gold hover:text-makapuu-night flex items-center justify-center transition-all shadow-xl">
+            →
+          </button>
+
+        </div>
+
+        <!-- Carousel Indicators & Autoplay Toggle -->
+        <div class="mt-8 flex items-center justify-center space-x-6">
+          <div class="flex items-center space-x-2">
+            <span class="vortex-dot w-9 h-1.5 rounded-full bg-sand-brightGold shadow-[0_0_10px_#dfc08f] transition-all duration-300" onclick="selectVortexNode(0)"></span>
+            <span class="vortex-dot w-3 h-1.5 rounded-full bg-sand-gold/25 hover:bg-sand-gold/60 transition-all duration-300" onclick="selectVortexNode(1)"></span>
+            <span class="vortex-dot w-3 h-1.5 rounded-full bg-sand-gold/25 hover:bg-sand-gold/60 transition-all duration-300" onclick="selectVortexNode(2)"></span>
+            <span class="vortex-dot w-3 h-1.5 rounded-full bg-sand-gold/25 hover:bg-sand-gold/60 transition-all duration-300" onclick="selectVortexNode(3)"></span>
+            <span class="vortex-dot w-3 h-1.5 rounded-full bg-sand-gold/25 hover:bg-sand-gold/60 transition-all duration-300" onclick="selectVortexNode(4)"></span>
+          </div>
+
+          <button onclick="toggleVortexAutoplay()" class="px-3.5 py-1.5 rounded-full bg-makapuu-deep/90 border border-sand-gold/30 text-sand-gold hover:text-sand-brightGold font-mono text-[10px] tracking-wider uppercase flex items-center space-x-2 transition-all">
+            <span id="vortex-play-icon">⏸</span>
+            <span id="vortex-play-text">WAVE FLOW</span>
+          </button>
+
+          <span id="vortex-counter" class="font-mono text-xs text-sand-ecru/60">01 / 05</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         PAGE 5: PORTFOLIO (2D 인터랙티브 세계 항법 지도 & 8대 글로벌 허브)
+         ========================================================== -->
+    <section id="global-grid" class="py-24 sm:py-32 px-6 border-b sand-border bg-makapuu-night relative overflow-hidden">
+      <div class="max-w-7xl mx-auto relative z-10">
+        
+        <!-- Section Header -->
+        <div class="text-center max-w-3xl mx-auto mb-16">
+          <div class="inline-flex items-center space-x-3 mb-4 px-4 py-1.5 rounded-full bg-makapuu-deep/80 border border-sand-gold/30">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-pulse"></span>
+            <span class="text-sand-brightGold font-serif italic text-sm sm:text-base whitespace-nowrap">4. The 8 Global Hubs Portfolio</span>
+            <span class="w-4 h-[1px] bg-sand-gold/40"></span>
+            <span class="text-[10px] uppercase tracking-[0.28em] font-mono text-sand-ecru/70 whitespace-nowrap">Global Axis</span>
+          </div>
+          <h2 class="font-serif text-3xl sm:text-5xl text-sand-base font-normal tracking-tight mb-4">
+            Pacific &amp; Global Trophy Grid
+          </h2>
+          <p class="font-kr text-sand-ecru/80 text-xs sm:text-sm font-light leading-relaxed break-keep">
+            환태평양과 대서양을 잇는 엘오션인터내셔널의 8대 핵심 거점 지도입니다. 각 도시 노드를 클릭하거나 아래 버튼을 선택하면 해당 거점의 극비 개발 포트폴리오 도시에가 펼쳐집니다.
+          </p>
+        </div>
+
+        <!-- 2D Interactive Geo-Radar Map Viewport -->
+        <div class="relative w-full rounded-3xl border sand-border bg-makapuu-deep/80 backdrop-blur-md overflow-hidden shadow-2xl mb-12">
+          
+          <!-- Coordinates & Radar Status Overlay -->
+          <div class="absolute top-6 left-6 z-10 flex flex-col space-y-1 font-mono text-[11px] text-sand-ecru/70 pointer-events-none">
+            <span class="text-sand-gold font-semibold uppercase">2D GLOBAL NAVAL RADAR</span>
+            <span>TRANS-PACIFIC ARCHITECTURAL AXIS // 8 NODES LOCKED</span>
+            <span class="text-xs text-sand-brightGold font-mono mt-1">CLICK CITY NODE OR BUTTON TO EXPAND DOSSIER</span>
+          </div>
+
+          <!-- Active Hub Indicator (Top Right) -->
+          <div class="absolute top-6 right-6 z-10 hidden sm:flex items-center space-x-2 font-mono text-xs px-3.5 py-1.5 rounded-full bg-makapuu-dark/80 border border-sand-gold/30 text-sand-brightGold">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-ping"></span>
+            <span id="radar-active-hub-text">HONOLULU APEX ACTIVE</span>
+          </div>
+
+          <!-- 2D Canvas Container -->
+          <div id="globe-viewport" class="relative w-full h-[460px] sm:h-[540px] cursor-crosshair">
+            <canvas id="world-map-2d-canvas" class="w-full h-full block"></canvas>
+            <!-- Interactive HTML Tooltip -->
+            <div id="map-node-tooltip" class="absolute pointer-events-none opacity-0 transition-opacity duration-200 px-3 py-1.5 rounded-lg bg-makapuu-night/95 border border-sand-gold/50 text-[11px] font-mono text-sand-brightGold shadow-xl z-20 whitespace-nowrap -translate-x-1/2 -translate-y-12">
+              <span id="tooltip-city-name" class="font-bold">HONOLULU</span>
+              <span id="tooltip-city-sub" class="text-sand-ecru/60 text-[9px] block">하와이 본부</span>
+            </div>
+          </div>
+
+          <!-- Bottom Telemetry HUD Line -->
+          <div class="px-6 py-3 border-t sand-border bg-makapuu-dark/90 flex flex-wrap items-center justify-between gap-4 font-mono text-[10px] sm:text-[11px] text-sand-ecru/60">
+            <div class="flex items-center space-x-4">
+              <span>PROJECTION: CYLINDRICAL EQUIDISTANT GRID</span>
+              <span class="text-sand-gold">★ HONOLULU MASTER ANCHOR</span>
+            </div>
+            <div class="flex items-center space-x-4">
+              <span>LAT/LONG CALIBRATED</span>
+              <span class="text-sand-brightGold">8 METROPOLITAN AXES CONNECTED</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 Global Hubs Quick Navigation Buttons Grid (Includes Las Vegas) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+          
+          <button id="btn-honolulu" onclick="openCityPortfolio('honolulu')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group border-sand-gold bg-sand-gold/15">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">01 / APEX</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Honolulu</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">하와이 본부</span>
+          </button>
+
+          <button id="btn-seoul" onclick="openCityPortfolio('seoul')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">02 / CAPITAL</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Seoul</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">서울 홀딩스</span>
+          </button>
+
+          <button id="btn-tokyo" onclick="openCityPortfolio('tokyo')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">03 / ENCLAVE</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Tokyo</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">도쿄 헤리티지</span>
+          </button>
+
+          <button id="btn-osaka" onclick="openCityPortfolio('osaka')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">04 / WATERFRONT</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Osaka</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">오사카 수변축</span>
+          </button>
+
+          <button id="btn-singapore" onclick="openCityPortfolio('singapore')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">05 / STRAITS</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Singapore</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">싱가포르 적도축</span>
+          </button>
+
+          <button id="btn-hongkong" onclick="openCityPortfolio('hongkong')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">06 / HARBOUR</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Hong Kong</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">홍콩 빅토리아</span>
+          </button>
+
+          <button id="btn-lasvegas" onclick="openCityPortfolio('lasvegas')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">07 / OASIS</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">Las Vegas</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">라스베이거스</span>
+          </button>
+
+          <button id="btn-newyork" onclick="openCityPortfolio('newyork')" class="city-btn p-3.5 rounded-2xl bg-makapuu-deep/80 border sand-border hover:border-sand-gold text-left transition-all group">
+            <span class="text-[9px] font-mono text-sand-gold uppercase block mb-0.5">08 / ATLANTIC</span>
+            <span class="font-serif text-sm sm:text-base text-sand-base block font-medium group-hover:text-sand-brightGold">New York</span>
+            <span class="text-[10px] text-sand-ecru/50 block font-kr">뉴욕 허드슨축</span>
+          </button>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================================
+         PAGE 6: PRIVATE PROTOCOL (대외비 문의 및 제휴 채널)
+         ========================================================== -->
+    <section id="contact" class="py-24 sm:py-32 px-6 border-b sand-border bg-gradient-to-b from-makapuu-night via-makapuu-dark to-makapuu-deep relative overflow-hidden">
+      <div class="max-w-4xl mx-auto relative z-10">
+        
+        <!-- Header -->
+        <div class="text-center mb-16">
+          <div class="inline-flex items-center space-x-3 mb-4 px-4 py-1.5 rounded-full bg-makapuu-deep/80 border border-sand-gold/30">
+            <span class="w-2 h-2 rounded-full bg-sand-brightGold animate-pulse"></span>
+            <span class="text-sand-brightGold font-serif italic text-sm sm:text-base">5. Confidential Protocol</span>
+            <span class="w-4 h-[1px] bg-sand-gold/40"></span>
+            <span class="text-[10px] uppercase tracking-[0.28em] font-mono text-sand-ecru/70">Direct Registry</span>
+          </div>
+          <h2 class="font-serif text-3xl sm:text-5xl text-sand-base font-normal tracking-tight mb-4">
+            Private Institutional Protocol
+          </h2>
+          <p class="font-kr text-sand-ecru/80 text-xs sm:text-sm font-light leading-relaxed max-w-xl mx-auto break-keep">
+            글로벌 패밀리 오피스, 기관 투자자, 슈퍼프라임 대지 소유주 및 4대 사업 부문과의 프라이빗 제휴를 위한 보안 채널입니다. 모든 제안서는 경영 총괄실로 직접 전달됩니다.
+          </p>
+        </div>
+
+        <!-- Protocol Form Card -->
+        <div class="p-8 sm:p-12 rounded-3xl bg-makapuu-dark/90 border sand-border backdrop-blur-xl shadow-2xl">
+          <form onsubmit="event.preventDefault(); handleSendProtocol();" class="space-y-6">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label for="proto-name" class="block text-[11px] font-mono uppercase tracking-wider text-sand-gold mb-2">성함 또는 기관/법인명 *</label>
+                <input type="text" id="proto-name" required placeholder="예: 패밀리 오피스 대표 / 홍길동" class="w-full px-4 py-3 rounded-xl bg-makapuu-night/80 border sand-border text-sand-base text-sm focus:outline-none focus:border-sand-gold font-sans placeholder-sand-ecru/25">
+              </div>
+
+              <div>
+                <label for="proto-email" class="block text-[11px] font-mono uppercase tracking-wider text-sand-gold mb-2">회신 이메일 주소 *</label>
+                <input type="email" id="proto-email" required placeholder="contact@institution.com" class="w-full px-4 py-3 rounded-xl bg-makapuu-night/80 border sand-border text-sand-base text-sm focus:outline-none focus:border-sand-gold font-sans placeholder-sand-ecru/25">
+              </div>
+            </div>
+
+            <div>
+              <label for="proto-subject" class="block text-[11px] font-mono uppercase tracking-wider text-sand-gold mb-2">문의 및 제휴 영역 *</label>
+              <select id="proto-subject" class="w-full px-4 py-3 rounded-xl bg-makapuu-night/80 border sand-border text-sand-base text-sm focus:outline-none focus:border-sand-gold font-sans">
+                <option value="JOSIAH LIGHTHOUSE (글로벌 부동산 개발 제휴)">JOSIAH LIGHTHOUSE (글로벌 슈퍼프라임 부동산 개발 & 대지 매각/매입)</option>
+                <option value="OCEAN HEARTS (뷰티·패션·공간 브랜딩 제휴)">OCEAN HEARTS (하이엔드 뷰티·패션 및 플래그십 공간 브랜딩)</option>
+                <option value="SEOUL LINE (글로벌 콘텐츠 투자펀드)">SEOUL LINE (K-POP 월드 투어 & 글로벌 영화/시리즈 IP 투자 펀드)</option>
+                <option value="Coral LLC (나이트클럽·음악 프로듀싱)">Coral LLC (도쿄·홍콩·뉴욕·서울 하이퍼 클럽 & 글로벌 페스티벌)</option>
+                <option value="기타 기밀 안건 (Executive Briefing)">기타 패밀리 오피스 및 기관 투자 기밀 안건</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="proto-message" class="block text-[11px] font-mono uppercase tracking-wider text-sand-gold mb-2">제안 및 문의 내용 *</label>
+              <textarea id="proto-message" rows="5" required placeholder="제안하시고자 하는 대지 위치, 투자 규모 또는 사업 협력 내용을 간략히 기재해주십시오." class="w-full px-4 py-3 rounded-xl bg-makapuu-night/80 border sand-border text-sand-base text-sm focus:outline-none focus:border-sand-gold font-sans placeholder-sand-ecru/25"></textarea>
+            </div>
+
+            <!-- Submission Feedback Notice -->
+            <div id="protocol-success" class="hidden p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 font-kr text-xs text-center font-medium"></div>
+
+            <div class="pt-2">
+              <button type="submit" class="w-full py-4 rounded-xl bg-sand-gold hover:bg-sand-brightGold text-makapuu-night font-sans font-bold text-xs uppercase tracking-[0.22em] transition-all duration-300 shadow-xl hover:shadow-sand-gold/25 hover:-translate-y-0.5">
+                TRANSMIT PROTOCOL TO EXECUTIVE OFFICE
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 text-[10px] font-mono text-sand-ecru/40">
+              <span>SECURITY: 256-BIT ENCRYPTED CHANNEL</span>
+              <span>DIRECT ROUTE: <a href="mailto:id20wh@naver.com" class="text-sand-gold hover:underline">id20wh@naver.com</a></span>
+            </div>
+
+          </form>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================
+       FOOTER
+       ========================================================== -->
+  <footer class="py-12 px-6 bg-makapuu-night border-t sand-border relative z-10 text-sand-ecru/60 font-sans text-xs">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+      
+      <!-- Company Brand & Identity -->
+      <div class="flex flex-col items-center md:items-start space-y-1.5 text-center md:text-left">
+        <span class="font-serif text-lg tracking-[0.2em] text-sand-base font-semibold">L-OCEAN INTERNATIONAL</span>
+        <p class="font-kr text-[11px] text-sand-ecru/50 tracking-wide">
+          엘오션인터내셔널 홀딩스 &bull; 환태평양 슈퍼프라임 대지 디벨로퍼
+        </p>
+      </div>
+
+      <!-- Essential Minimal Registry & Contact -->
+      <div class="flex flex-col items-center md:items-end space-y-1 text-center md:text-right font-mono text-[10px] text-sand-ecru/45">
+        <div class="flex items-center space-x-3 text-sand-gold/80">
+          <span>CONTACT</span>
+          <span class="text-sand-ecru/30">|</span>
+          <a href="mailto:id20wh@naver.com" class="hover:text-sand-brightGold hover:underline transition-colors">id20wh@naver.com</a>
+        </div>
+        <p class="font-mono text-[10px] text-sand-ecru/40 pt-0.5">
+          &copy; 2026 L-OCEAN INTERNATIONAL HOLDINGS. ALL RIGHTS RESERVED.
+        </p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================================
+       BUSINESS PILLAR DYNAMIC EXPANSION MODAL (역동적 파도 팝업 뷰어)
+       ========================================================== -->
+  <div id="business-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-makapuu-night/90 backdrop-blur-xl opacity-0 pointer-events-none transition-all duration-500">
+    <!-- Wave Splash Burst Canvas during modal opening -->
+    <canvas id="business-wave-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+    <div id="biz-modal-card" class="modal-card max-w-4xl w-full max-h-[92vh] overflow-y-auto rounded-3xl bg-makapuu-deep border border-sand-gold/40 shadow-[0_30px_90px_rgba(0,0,0,0.9)] p-6 sm:p-10 relative scale-90 opacity-0 transform-gpu transition-all duration-500 z-10">
+      
+      <!-- Close Button -->
+      <button onclick="closeBusinessDetailModal()" class="absolute top-6 right-6 w-11 h-11 rounded-full border border-sand-gold/30 bg-makapuu-dark/90 text-sand-ecru hover:text-sand-brightGold hover:border-sand-gold flex items-center justify-center transition-all z-20 shadow-xl group">
+        <span class="text-xl leading-none group-hover:rotate-90 transition-transform duration-300">✕</span>
+      </button>
+
+      <!-- Modal Content Header -->
+      <div class="flex flex-wrap items-center gap-3 pb-4 border-b border-sand-gold/20 mb-6">
+        <span id="b-div-badge" class="px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase font-bold shadow-md">
+          DIV 01 &bull; LAND
+        </span>
+        <span id="b-division-code" class="text-sand-ecru/50 text-[11px] font-mono">CODE #L-OCN-DIV-01</span>
+        <span id="b-meta-axis" class="text-sand-brightGold text-[11px] font-mono ml-auto font-semibold">8 GLOBAL AXIS</span>
+      </div>
+
+      <!-- Cinematic Hero Image & Overlay -->
+      <div class="aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden border border-sand-gold/30 relative mb-8 bg-makapuu-night shadow-2xl">
+        <img id="b-image" src="" alt="Business Detail Visual" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-makapuu-night via-makapuu-night/30 to-transparent"></div>
+        <div class="absolute bottom-5 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <span id="b-category-label" class="text-[11px] font-mono uppercase tracking-widest text-sand-gold block font-semibold">
+              Global Trophy Real Estate Development
+            </span>
+            <h3 id="b-title" class="font-serif text-2xl sm:text-4xl text-sand-base font-bold mt-1 tracking-tight">
+              JOSIAH LIGHTHOUSE
+            </h3>
+            <span id="b-korean-name" class="font-kr text-sm sm:text-base font-semibold text-sand-brightGold block mt-0.5">
+              글로벌 부동산 개발
+            </span>
+          </div>
+          <span id="b-status-badge" class="self-start sm:self-auto text-xs font-mono px-3.5 py-1.5 rounded-lg bg-makapuu-night/90 border border-sand-gold/50 text-sand-brightGold whitespace-nowrap font-bold shadow-lg">
+            OPERATIONAL APEX
+          </span>
+        </div>
+      </div>
+
+      <!-- Detailed Narrative Matrix -->
+      <div class="space-y-6 mb-8">
+        <div>
+          <h4 class="text-[11px] uppercase font-serif tracking-widest text-sand-gold mb-2 font-bold flex items-center space-x-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-sand-brightGold"></span>
+            <span>STRATEGIC EXECUTIVE SUMMARY (EN)</span>
+          </h4>
+          <p id="b-desc-en" class="font-serif text-sand-ecru/90 text-sm sm:text-base font-light leading-relaxed text-justify"></p>
+        </div>
+
+        <div class="pt-4 border-t border-sand-gold/20">
+          <h4 class="text-xs uppercase font-kr tracking-wide text-sand-brightGold mb-2 font-bold flex items-center space-x-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-sand-gold"></span>
+            <span>사업 영역 및 운영 철학 (KR)</span>
+          </h4>
+          <p id="b-desc-kr" class="font-kr text-sand-ecru/85 text-xs sm:text-sm font-normal leading-relaxed text-justify break-keep"></p>
+        </div>
+      </div>
+
+      <!-- Operational Geographies & Locations (Styled in Dark Container Box) -->
+      <div class="mb-8 p-5 rounded-2xl bg-makapuu-night/80 border border-sand-gold/25 backdrop-blur-md shadow-inner">
+        <div class="flex items-center space-x-2 mb-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-sand-brightGold animate-pulse"></span>
+          <span class="text-[10px] font-mono tracking-widest uppercase text-sand-gold font-semibold">OPERATIONAL GEOGRAPHIES / 영업 거점 위치</span>
+        </div>
+        <div id="b-tags-container" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Footer Action -->
+      <div class="pt-6 border-t border-sand-gold/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-[10px] font-serif tracking-widest uppercase text-sand-ecru/50">
+          L-Ocean Tangible Ecosystem Dossier
+        </span>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+          <button onclick="closeBusinessDetailModal()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-full border border-sand-gold/30 text-sand-ecru text-xs hover:border-sand-gold transition-colors font-mono">
+            CLOSE
+          </button>
+          <a href="#contact" onclick="closeBusinessDetailModal()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-full bg-sand-gold hover:bg-sand-brightGold text-makapuu-night font-sans font-bold text-xs tracking-wider uppercase transition-colors text-center shadow-lg">
+            PARTNERSHIP INQUIRY →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================
+       LUXURY DOSSIER MODAL (POPUP WINDOW)
+       ========================================================== -->
+  <div id="portfolio-modal" class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-makapuu-night/85 backdrop-blur-md opacity-0 pointer-events-none transition-all duration-300">
+    <div id="modal-card" class="modal-card max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-3xl bg-makapuu-deep border border-sand-gold/40 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] p-6 sm:p-10 relative scale-95 transform">
+      
+      <!-- Close Button -->
+      <button onclick="closeCityPortfolio()" class="absolute top-6 right-6 w-10 h-10 rounded-full border sand-border bg-makapuu-dark/80 text-sand-ecru hover:text-sand-brightGold hover:border-sand-gold flex items-center justify-center transition-all z-20">
+        <span class="text-xl leading-none">✕</span>
+      </button>
+
+      <!-- Modal Content Header -->
+      <div class="flex items-center space-x-3 pb-4 border-b sand-border mb-6">
+        <span class="px-3 py-1 rounded-full bg-sand-gold/20 text-sand-brightGold text-[10px] font-mono tracking-widest uppercase" id="m-tag">
+          PACIFIC FLAGSHIP HUB
+        </span>
+        <span class="text-sand-ecru/40 text-[11px] font-mono" id="m-file">FILE #L-OCN-01</span>
+        <span class="text-sand-gold text-[11px] font-mono ml-auto" id="m-coords">21.3069° N, 157.8583° W</span>
+      </div>
+
+      <!-- Hero Visual Aspect -->
+      <div class="aspect-[16/9] sm:aspect-[21/9] rounded-2xl overflow-hidden border sand-border relative mb-8 bg-makapuu-surf">
+        <img id="m-image" src="" alt="Project Visual" class="w-full h-full object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-makapuu-night/95 via-transparent to-transparent"></div>
+        <div class="absolute bottom-5 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+          <div>
+            <span class="text-[11px] font-mono uppercase tracking-widest text-sand-gold block" id="m-type">Pacific Oceanfront Sanctuary</span>
+            <h3 class="font-serif text-2xl sm:text-4xl text-sand-base mt-1" id="m-title">The Makapu'u &amp; Waikiki Ocean Citadel</h3>
+          </div>
+          <span class="self-start sm:self-auto text-xs font-mono px-3.5 py-1.5 rounded-lg bg-makapuu-night/90 border border-sand-gold/50 text-sand-brightGold whitespace-nowrap" id="m-status">
+            Under Development
+          </span>
+        </div>
+      </div>
+
+      <!-- Narrative Text -->
+      <div class="space-y-4 mb-8">
+        <div>
+          <h4 class="text-[10px] uppercase font-mono tracking-widest text-sand-gold mb-1.5">Executive Summary (English)</h4>
+          <p class="font-sans text-sand-ecru/90 text-sm font-light leading-relaxed" id="m-desc-en"></p>
+        </div>
+        <div class="pt-2 border-t sand-border">
+          <h4 class="text-[10px] uppercase font-mono tracking-widest text-sand-gold mb-1.5">개발 및 기획 개요 (Korean)</h4>
+          <p class="font-kr text-sand-ecru/80 text-xs sm:text-sm font-light leading-relaxed" id="m-desc-kr"></p>
+        </div>
+      </div>
+
+      <!-- Key Specifications Matrix -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-5 rounded-2xl bg-makapuu-dark/90 border sand-border mb-8">
+        <div>
+          <span class="text-[9px] uppercase font-mono text-sand-ecru/50 block">Site Footprint</span>
+          <span class="font-serif text-lg text-sand-brightGold font-semibold block mt-1" id="m-scale">42,500 m²</span>
+        </div>
+        <div>
+          <span class="text-[9px] uppercase font-mono text-sand-ecru/50 block">Design Typology</span>
+          <span class="font-sans text-xs text-sand-base block mt-1" id="m-arch">Terra-Mare Organic</span>
+        </div>
+        <div>
+          <span class="text-[9px] uppercase font-mono text-sand-ecru/50 block">Target Horizons</span>
+          <span class="font-sans text-xs text-sand-base block mt-1" id="m-target">Generational Asset</span>
+        </div>
+      </div>
+
+      <!-- Footer Action -->
+      <div class="pt-6 border-t sand-border flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-[10px] font-mono tracking-widest uppercase text-sand-ecru/50">Confidential Investor Briefing</span>
+        <div class="flex items-center space-x-3 w-full sm:w-auto">
+          <button onclick="closeCityPortfolio()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-full border sand-border text-sand-ecru text-xs hover:border-sand-gold transition-colors">
+            닫기
+          </button>
+          <a href="#contact" onclick="closeCityPortfolio()" class="flex-1 sm:flex-initial px-6 py-2.5 rounded-full bg-sand-gold hover:bg-sand-brightGold text-makapuu-night font-sans font-semibold text-xs tracking-wider uppercase transition-colors text-center">
+            투자/제휴 문의하기 →
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // 4 Tangible Business Pillars Detailed Dossier Database (1:1 Match EN/KR, Pure Geographies)
+    const businessDossiers = {
+      1: {
+        badge: "DIV 01 • LAND",
+        badgeColor: "bg-amber-400/20 text-amber-300 border border-amber-400/50",
+        code: "CODE #L-OCN-DIV-01",
+        axis: "8 GLOBAL METROPOLISES",
+        title: "JOSIAH LIGHTHOUSE",
+        koreanName: "글로벌 부동산 개발 (Global Trophy Real Estate Development)",
+        category: "Pacific & Global Trophy Land Developer",
+        image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=1600&q=80",
+        descEn: "JOSIAH LIGHTHOUSE is L-Ocean International's flagship real estate development division, commanding sovereign land across the world's most coveted gateway cities. We preemptively acquire and assemble super-prime coastal and metropolitan parcels across Honolulu, New York, Las Vegas, Tokyo, Osaka, Seoul, Hong Kong, and Singapore. Bypassing volatile speculative trends, we engineer permanent architectural landmarks sculpted from enduring natural stone, ensuring lasting generational permanence and historic capital preservation.",
+        descKr: "조시아 라이트하우스(JOSIAH LIGHTHOUSE)는 엘오션인터내셔널의 대지 지배력을 증명하는 최상위 부동산 개발 브랜드입니다. 우리는 하와이 호놀룰루, 뉴욕, 라스베이거스, 도쿄, 오사카, 서울, 홍콩, 싱가포르 등 세계 최고 권역의 슈퍼프라임 해안 및 메트로폴리스 대지를 선제적으로 매입·결집합니다. 단기적 투기 유행을 배제하고 100년을 견디는 자연석과 정밀한 건축 공학을 통해 세대를 이어 전승될 불변의 랜드마크 유산 자산을 축조합니다.",
+        tags: ["하와이 호놀룰루 (Honolulu)", "뉴욕 맨해튼 (New York)", "라스베이거스 (Las Vegas)", "도쿄 미나토·긴자 (Tokyo)", "오사카 수변축 (Osaka)", "서울 홀딩스 (Seoul)", "홍콩 빅토리아 (Hong Kong)", "싱가포르 마리나 (Singapore)"]
+      },
+      2: {
+        badge: "DIV 02 • BRANDING",
+        badgeColor: "bg-emerald-400/20 text-emerald-300 border border-emerald-400/50",
+        code: "CODE #L-OCN-DIV-02",
+        axis: "HAUTE COUTURE & SPACE ATELIER",
+        title: "OCEAN HEARTS",
+        koreanName: "뷰티 • 패션 • 공간 브랜딩 (Beauty, Fashion & Space Branding)",
+        category: "Haute Couture & Spatial Architecture Atelier",
+        image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80",
+        descEn: "OCEAN HEARTS embodies the definitive sensory and aesthetic empire of L-Ocean International. Connecting Seoul, Paris, Tokyo, and premier Pacific luxury corridors, we curate rare marine cosmetic formulations, haute couture runway collections, and bespoke spatial architecture. By translating oceanic rhythm and sculptural modernism into physical reality, Ocean Hearts sets an uncompromising global benchmark for ultra-luxury lifestyle, flagship environments, and emotional elegance.",
+        descKr: "오션 하츠(OCEAN HEARTS)는 엘오션인터내셔널의 감각적 미학과 라이프스타일을 구현하는 하이엔드 뷰티, 패션, 공간 브랜딩 아틀리에입니다. 서울, 파리, 도쿄 및 태평양 럭셔리 회랑을 연결하며 독보적인 해양 성분 코스메틱 포뮬레이션, 오뜨 꾸뛰르 런웨이 패션, 그리고 독창적인 플래그십 공간 건축을 통합 기획합니다. 대지와 파도의 유기적 곡선을 물리적 공간과 오브제로 재해석하여 최상위 라이프스타일의 기준을 제시합니다.",
+        tags: ["서울 아틀리에 (Seoul Atelier)", "파리 패션 회랑 (Paris Corridor)", "도쿄 플래그십 (Tokyo Flagship)", "태평양 프라이빗 생태계 (Pacific Circuit)"]
+      },
+      3: {
+        badge: "DIV 03 • CAPITAL",
+        badgeColor: "bg-violet-400/20 text-violet-300 border border-violet-400/50",
+        code: "CODE #L-OCN-DIV-03",
+        axis: "K-POP & MEGA IP CAPITAL",
+        title: "SEOUL LINE",
+        koreanName: "콘텐츠 투자펀드 (Global Content & Media Investment Fund)",
+        category: "K-POP Arena Tours & Global Cinematic Media Fund",
+        image: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1600&q=80",
+        descEn: "SEOUL LINE serves as L-Ocean International's cross-border cultural financing powerhouse, commanding global media capital. Operating across Seoul, Los Angeles, London, and international arena circuits, we deploy mega-scale investments into stadium-scale K-POP world tours, top-tier cinematic films, streaming series IP, and immersive media art technologies. By fusing artistic brilliance with sovereign institutional capital, Seoul Line directs the cultural heartbeat of a hyper-connected world.",
+        descKr: "서울 라인(SEOUL LINE)은 전 세계를 열광시키는 글로벌 문화 자본을 지휘하는 엘오션인터내셔널의 메가 콘텐츠 투자펀드입니다. 서울 본부, 로스앤젤레스, 런던 및 글로벌 아레나 투어 서킷 전역에 걸쳐 최정상 K-POP 아티스트의 스타디움급 월드 투어 제작, 글로벌 블록버스터 영화·시리즈 메가 IP, 차세대 몰입형 미디어 아트 기술에 대규모 자본을 투자합니다. 강력한 문화적 파급력과 영구적인 자본 가치를 동시에 창출합니다.",
+        tags: ["서울 콘텐츠 허브 (Seoul Hub)", "로스앤젤레스 엔터테인먼트 (Los Angeles)", "런던 미디어 서킷 (London)", "글로벌 스타디움 투어망 (Global Arena Circuit)"]
+      },
+      4: {
+        badge: "DIV 04 • NIGHTLIFE",
+        badgeColor: "bg-pink-500/20 text-pink-300 border border-pink-400/50",
+        code: "CODE #L-OCN-DIV-04",
+        axis: "4 NOCTURNAL HUBS (TYO • HK • NYC • SEL)",
+        title: "Coral LLC",
+        koreanName: "나이트클럽 • 프로듀싱 (Ultra-Luxury Nightclub Ecosystem)",
+        category: "Nocturnal Entertainment & Global Music Producing",
+        image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Coral LLC dictates the premier nocturnal frequencies across four iconic megacities: Tokyo, Hong Kong, New York, and Seoul. We design, own, and operate ultra-exclusive hyper-clubs, confidential members-only lounges, and world-class electronic music festival productions. By uniting global headline sound production, cutting-edge stage engineering, and international high society, Coral LLC curates the definitive nocturnal pulse that never sleeps.",
+        descKr: "코랄(Coral LLC)은 도쿄, 홍콩, 뉴욕, 서울 4대 메가시티의 밤을 지배하는 최상위 하이퍼 나이트클럽과 프라이빗 라운지 생태계를 기획·운영합니다. 세계 최정상 아티스트 및 DJ와 협업하는 글로벌 음악 프로듀싱, 초대형 페스티벌 스테이지 엔지니어링을 결합하여 예술, 음악, 최상류층 소사이어티가 교차하는 독보적인 밤의 성역을 구축하며 잠들지 않는 도시의 에너지를 통제합니다.",
+        tags: ["도쿄 롯폰기·시부야 (Tokyo)", "홍콩 란콰이펑·센트럴 (Hong Kong)", "뉴욕 맨해튼 (New York)", "서울 강남·이태원 (Seoul)"]
+      }
+    };
+
+    // Wave Splash Shockwave Particle Engine for Card Click
+    let bizWaveCanvas, bizWaveCtx, bizWaveW, bizWaveH;
+    let waveRipples = [];
+
+    class WaveShockRipple {
+      constructor(cx, cy, color) {
+        this.cx = cx;
+        this.cy = cy;
+        this.radius = 10;
+        this.maxRadius = Math.max(bizWaveW, bizWaveH) * 0.9;
+        this.speed = 18;
+        this.alpha = 0.95;
+        this.color = color || '#DFC08F';
+        this.foamSpots = [];
+        for (let i = 0; i < 45; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          this.foamSpots.push({
+            angle: angle,
+            distRatio: 0.85 + Math.random() * 0.25,
+            size: 2 + Math.random() * 4.5,
+            wobble: Math.random() * 10
+          });
+        }
+      }
+      update() {
+        this.radius += this.speed;
+        this.speed *= 0.97;
+        this.alpha = Math.max(0, 1 - (this.radius / this.maxRadius));
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+
+        // Wave Ring Gradient
+        const grad = ctx.createRadialGradient(this.cx, this.cy, Math.max(0, this.radius - 40), this.cx, this.cy, this.radius + 30);
+        grad.addColorStop(0, 'rgba(6, 11, 18, 0)');
+        grad.addColorStop(0.5, this.color);
+        grad.addColorStop(0.8, 'rgba(255, 255, 255, 0.9)');
+        grad.addColorStop(1, 'rgba(22, 42, 69, 0)');
+
+        ctx.beginPath();
+        ctx.arc(this.cx, this.cy, this.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 14;
+        ctx.stroke();
+
+        // Crashing White Foam Particles riding the wave crest
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = '#FFFFFF';
+        ctx.shadowBlur = 8;
+        this.foamSpots.forEach(f => {
+          const r = this.radius * f.distRatio;
+          const x = this.cx + Math.cos(f.angle) * r;
+          const y = this.cy + Math.sin(f.angle) * r;
+          ctx.beginPath();
+          ctx.arc(x, y, f.size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.restore();
+      }
+    }
+
+    function initBizWaveCanvas() {
+      bizWaveCanvas = document.getElementById('business-wave-canvas');
+      if (!bizWaveCanvas) return;
+      bizWaveCtx = bizWaveCanvas.getContext('2d');
+      bizWaveW = bizWaveCanvas.width = window.innerWidth;
+      bizWaveH = bizWaveCanvas.height = window.innerHeight;
+
+      window.addEventListener('resize', () => {
+        if (bizWaveCanvas) {
+          bizWaveW = bizWaveCanvas.width = window.innerWidth;
+          bizWaveH = bizWaveCanvas.height = window.innerHeight;
+        }
+      });
+
+      function renderWaveRipples() {
+        if (bizWaveCtx) {
+          bizWaveCtx.clearRect(0, 0, bizWaveW, bizWaveH);
+          for (let i = waveRipples.length - 1; i >= 0; i--) {
+            waveRipples[i].update();
+            waveRipples[i].draw(bizWaveCtx);
+            if (waveRipples[i].alpha <= 0.01) {
+              waveRipples.splice(i, 1);
+            }
+          }
+        }
+        requestAnimationFrame(renderWaveRipples);
+      }
+      renderWaveRipples();
+    }
+    initBizWaveCanvas();
+
+    // Trigger Dynamic Expansion of Business Card with Crashing Wave Effect
+    window.openBusinessDetailModal = function(moduleNum) {
+      const data = businessDossiers[moduleNum];
+      if (!data) return;
+
+      // Populate Modal Content
+      const badgeElem = document.getElementById('b-div-badge');
+      badgeElem.className = `px-3 py-1 rounded-full text-[10px] font-mono tracking-widest uppercase font-bold shadow-md ${data.badgeColor}`;
+      badgeElem.innerText = data.badge;
+
+      document.getElementById('b-division-code').innerText = data.code;
+      document.getElementById('b-meta-axis').innerText = data.axis;
+      document.getElementById('b-category-label').innerText = data.category;
+      document.getElementById('b-title').innerText = data.title;
+      document.getElementById('b-korean-name').innerText = data.koreanName;
+      document.getElementById('b-image').src = data.image;
+      document.getElementById('b-desc-en').innerText = data.descEn;
+      document.getElementById('b-desc-kr').innerText = data.descKr;
+
+      // Render Clean Operational Geography Tags Inside Dark Box
+      const tagsContainer = document.getElementById('b-tags-container');
+      tagsContainer.innerHTML = '';
+      data.tags.forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'px-3 py-1.5 rounded-xl bg-makapuu-deep/90 border border-sand-gold/30 text-[11px] font-kr font-medium text-sand-base shadow-sm hover:border-sand-brightGold transition-colors';
+        span.innerText = tag;
+        tagsContainer.appendChild(span);
+      });
+
+      // Fire Dynamic Wave Shockwave Effect from card center
+      const sourceCard = document.getElementById(`card-module-${moduleNum}`);
+      let cx = window.innerWidth / 2;
+      let cy = window.innerHeight / 2;
+      if (sourceCard) {
+        const rect = sourceCard.getBoundingClientRect();
+        cx = rect.left + rect.width / 2;
+        cy = rect.top + rect.height / 2;
+      }
+
+      const colors = {
+        1: '#FBBF24', // Amber Gold
+        2: '#34D399', // Emerald
+        3: '#A78BFA', // Violet
+        4: '#F472B6'  // Neon Pink
+      };
+
+      waveRipples.push(new WaveShockRipple(cx, cy, colors[moduleNum] || '#DFC08F'));
+      setTimeout(() => {
+        waveRipples.push(new WaveShockRipple(window.innerWidth / 2, window.innerHeight / 2, colors[moduleNum] || '#DFC08F'));
+      }, 150);
+
+      // Smoothly Scale & Reveal the Modal Window
+      const modal = document.getElementById('business-modal');
+      const card = document.getElementById('biz-modal-card');
+      if (modal && card) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          card.classList.remove('scale-90', 'opacity-0');
+          card.classList.add('scale-100', 'opacity-100');
+        }, 50);
+      }
+    };
+
+    window.closeBusinessDetailModal = function() {
+      const modal = document.getElementById('business-modal');
+      const card = document.getElementById('biz-modal-card');
+      if (modal && card) {
+        card.classList.remove('scale-100', 'opacity-100');
+        card.classList.add('scale-90', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.add('opacity-0', 'pointer-events-none');
+        }, 300);
+      }
+    };
+
+    // Close on backdrop click or ESC
+    const bizModal = document.getElementById('business-modal');
+    if (bizModal) {
+      bizModal.addEventListener('click', (e) => {
+        if (e.target === bizModal) closeBusinessDetailModal();
+      });
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeBusinessDetailModal();
+    });
+
+    // 7 Global Hubs Portfolio Database
+    const cityPortfolios = {
+      honolulu: {
+        cityName: "Honolulu",
+        cityKr: "하와이 호놀룰루",
+        tag: "01 / PACIFIC APEX FLAGSHIP",
+        file: "FILE #L-OCN-HNL-01",
+        coords: "21.3069° N, 157.8583° W",
+        title: "The Makapu'u & Waikiki Ocean Citadel",
+        type: "Pacific Oceanfront Sanctuary & Masterplan",
+        status: "Active Land Curation",
+        image: "https://images.unsplash.com/photo-1542259009477-d625272157b7?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Anchored directly along Oahu's prime oceanfront corridor, this masterplan integrates raw volcanic basalt topography with sculptural organic residences. L-Ocean secures rare coastal land parcels to build an enduring generational sanctuary that honors Hawaiian ecology and global architectural distinction.",
+        descKr: "하와이 오아후의 해안 슈퍼프라임 권역에 위치한 대규모 마스터플랜 프로젝트입니다. 용암 현무암 지형과 태평양 파도의 흐름을 수렴한 건축 설계를 통해 일시적 리조트 개발을 넘어 세대를 관통하는 독보적 유산 주거지로 완성합니다.",
+        scale: "58,400 m²",
+        arch: "Terra-Mare Organic High-End",
+        target: "Generational Legacy Asset",
+        lat: 21.3069,
+        lng: -157.8583
+      },
+      seoul: {
+        cityName: "Seoul",
+        cityKr: "대한민국 서울",
+        tag: "02 / EAST ASIA CAPITAL CORE",
+        file: "FILE #L-OCN-SEL-02",
+        coords: "37.5665° N, 126.9780° E",
+        title: "The Seoulline Monolith & Creative Holdings",
+        type: "Metropolitan Super-Prime Complex",
+        status: "Strategic Assembly Complete",
+        image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Positioned at Seoul's premier metropolitan axis, this landmark development synthesizes haute couture culture, fine art curation, and high-efficiency modular geometry. It acts as the operational holding spine for L-Ocean's trans-Pacific portfolio.",
+        descKr: "서울 수도권 최핵심 요지에 조성된 복합 랜드마크입니다. 패션, 뷰티, 아트 갤러리가 융합된 입체적 문화 공간을 축조하고, 엘오션인터내셔널의 환태평양 자산 포트폴리오를 총괄하는 글로벌 홀딩스 허브 역할을 수행합니다.",
+        scale: "34,200 m²",
+        arch: "Modernist Monolithic Grid",
+        target: "Holding & Cultural Landmark",
+        lat: 37.5665,
+        lng: 126.9780
+      },
+      tokyo: {
+        cityName: "Tokyo",
+        cityKr: "일본 도쿄",
+        tag: "03 / JAPAN EAST APEX",
+        file: "FILE #L-OCN-TYO-03",
+        coords: "35.6762° N, 139.6503° E",
+        title: "Aoyama & Ginza Heritage Pavilion",
+        type: "Private Salon & Trophy Land Reserve",
+        status: "Permitting & Value Engineering",
+        image: "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Curating prime land within Tokyo's most guarded luxury enclave. This project establishes an ultra-exclusive private members' club and architectural pavilion blending Japanese cedar aesthetics with international modernist precision.",
+        descKr: "도쿄 미나토구·긴자의 희소 대지를 결집하여 구축하는 프라이빗 헤리티지 프로젝트입니다. 일본 전통 목조 미학과 현대 하이테크 건축을 결합하여 최상위 VVIP를 위한 독점적 살롱과 장기 자산 가치를 확보합니다.",
+        scale: "16,800 m²",
+        arch: "Zen Minimalist Precision",
+        target: "Sovereign Private Reserve",
+        lat: 35.6762,
+        lng: 139.6503
+      },
+      osaka: {
+        cityName: "Osaka",
+        cityKr: "일본 오사카",
+        tag: "04 / JAPAN WEST GATEWAY",
+        file: "FILE #L-OCN-OSA-04",
+        coords: "34.6937° N, 135.5023° E",
+        title: "Nakanoshima Waterfront Axis",
+        type: "Canalfront Architectural Synthesis",
+        status: "Site Acquisition Complete",
+        image: "https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Set along the historic waterways of Osaka, this mixed-use asset redefines the city's commercial and culinary spirit into an internationally celebrated waterfront destination.",
+        descKr: "오사카 수변 중심축의 입지를 선점하여 문화예술과 상업시설이 조화를 이루는 워터프론트 랜드마크로 개발합니다. 도시 재생과 수변 공간의 가치를 극대화하는 프로젝트입니다.",
+        scale: "22,100 m²",
+        arch: "Waterfront Fluid Geometry",
+        target: "Urban Rebirth Monument",
+        lat: 34.6937,
+        lng: 135.5023
+      },
+      singapore: {
+        cityName: "Singapore",
+        cityKr: "싱가포르",
+        tag: "05 / STRAITS APEX",
+        file: "FILE #L-OCN-SGP-05",
+        coords: "1.3521° N, 103.8198° E",
+        title: "Marina Equator Tropical Sanctuary",
+        type: "Biophilic Sustainable Tower",
+        status: "Concept Design Finalized",
+        image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Synthesizing lush equatorial botany with net-zero architectural innovation. L-Ocean establishes a benchmark green tower catering to global family offices and maritime trading institutions.",
+        descKr: "적도권의 열대 식생과 제로에너지 건축 공학이 결합된 싱가포르의 친환경 랜드마크 타워입니다. 글로벌 패밀리 오피스와 해양 금융 기관을 위한 프리미엄 비즈니스 헤리티지입니다.",
+        scale: "41,000 m²",
+        arch: "Biophilic High-Rise",
+        target: "Global Family Office Hub",
+        lat: 1.3521,
+        lng: 103.8198
+      },
+      hongkong: {
+        cityName: "Hong Kong",
+        cityKr: "홍콩",
+        tag: "06 / VICTORIA CORRIDOR",
+        file: "FILE #L-OCN-HKG-06",
+        coords: "22.3193° N, 114.1694° E",
+        title: "Victoria Peak Sky Haven",
+        type: "Cliffside Ultra-Luxury Estate",
+        status: "Under Confidential Curation",
+        image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Perched high above Victoria Harbour, this hillside enclave redefines super-prime residential luxury. Engineered into granite cliffs, the project frames cinematic maritime vistas with discreet private access.",
+        descKr: "빅토리아 하버를 한눈에 굽어보는 최고급 절벽 입지에 조성되는 하이엔드 주거 프로젝트입니다. 천연 화강암 지형을 살린 독보적 조망 설계와 철저한 보안 체계를 갖추었습니다.",
+        scale: "14,500 m²",
+        arch: "Cantilevered Cliff Architecture",
+        target: "Ultra-Prime Trophy Estate",
+        lat: 22.3193,
+        lng: 114.1694
+      },
+      lasvegas: {
+        cityName: "Las Vegas",
+        cityKr: "미국 라스베이거스",
+        tag: "07 / DESERT OASIS APEX",
+        file: "FILE #L-OCN-LAS-07",
+        coords: "36.1699° N, 115.1398° W",
+        title: "The Mirage Bellagio Horizon Estate",
+        type: "Ultra-Luxury Oasis Resort & Entertainment Reserve",
+        status: "Pre-Development Strategic Land Assembly",
+        image: "https://images.unsplash.com/photo-1581351721010-8cf859cb14a4?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Positioned at the premier desert intersection of global high-stakes entertainment and architecture. L-Ocean secures exclusive acreage in Las Vegas, blending water oasis engineering with private high-roller sanctuaries and world-class nightlife integration.",
+        descKr: "글로벌 하이엔드 엔터테인먼트의 심장부인 라스베이거스의 핵심 입지를 선제적으로 매입하여 개발하는 오아시스 리조트 & 트로피 부동산 프로젝트입니다. 사막 속 워터 아키텍처와 프라이빗 VVIP 라운지, 나이트라이프 생태계를 유기적으로 결합합니다.",
+        scale: "62,000 m²",
+        arch: "Desert Oasis Parametric Sculpt",
+        target: "Entertainment Trophy Sovereign Asset",
+        lat: 36.1699,
+        lng: -115.1398
+      },
+      newyork: {
+        cityName: "New York",
+        cityKr: "미국 뉴욕",
+        tag: "08 / GLOBAL METROPOLIS APEX",
+        file: "FILE #L-OCN-NYC-08",
+        coords: "40.7128° N, 74.0060° W",
+        title: "Hudson Ocean Atlantic Citadel",
+        type: "Billionaire's Row Trans-Atlantic Hub",
+        status: "Joint Development Phase",
+        image: "https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=1600&q=80",
+        descEn: "Representing L-Ocean's strategic bridgehead across the Atlantic. Overlooking the Hudson River, this architectural tower merges New York's historic limestone grandeur with Pacific tranquility.",
+        descKr: "대서양과 태평양을 잇는 뉴욕 맨해튼의 플래그십 자산입니다. 허드슨강의 파노라마 조망을 품고 역사적 석재 파사드와 현대적 공간 미학을 조화롭게 융합했습니다.",
+        scale: "49,000 m²",
+        arch: "Neo-Classical Limestone & Glass",
+        target: "Global Trophy Apex",
+        lat: 40.7128,
+        lng: -74.0060
+      }
+    };
+
+    // Open Portfolio Modal Function (Globally Accessible)
+    window.openCityPortfolio = function(cityKey) {
+      const data = cityPortfolios[cityKey];
+      if (!data) return;
+
+      document.getElementById('m-tag').innerText = data.tag;
+      document.getElementById('m-file').innerText = data.file;
+      document.getElementById('m-coords').innerText = data.coords;
+      document.getElementById('m-title').innerText = data.title;
+      document.getElementById('m-type').innerText = data.type;
+      document.getElementById('m-status').innerText = data.status;
+      document.getElementById('m-desc-en').innerText = data.descEn;
+      document.getElementById('m-desc-kr').innerText = data.descKr;
+      document.getElementById('m-scale').innerText = data.scale;
+      document.getElementById('m-arch').innerText = data.arch;
+      document.getElementById('m-target').innerText = data.target;
+
+      const img = document.getElementById('m-image');
+      img.src = data.image;
+
+      // Highlight corresponding button
+      document.querySelectorAll('.city-btn').forEach(btn => {
+        btn.classList.remove('border-sand-gold', 'bg-sand-gold/20');
+      });
+      const activeBtn = document.getElementById(`btn-${cityKey}`);
+      if (activeBtn) activeBtn.classList.add('border-sand-gold', 'bg-sand-gold/20');
+
+      // Update radar status indicator
+      const activeIndicator = document.getElementById('radar-active-hub-text');
+      if (activeIndicator) {
+        activeIndicator.innerText = `${cityKey.toUpperCase()} ACTIVE`;
+      }
+
+      // Trigger 2D Map Ping & Ripple
+      if (typeof highlight2DMapCity === 'function') {
+        highlight2DMapCity(cityKey);
+      }
+
+      // Reveal popup smoothly
+      const modal = document.getElementById('portfolio-modal');
+      const card = document.getElementById('modal-card');
+      if (modal && card) {
+        modal.classList.remove('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-95');
+        card.classList.add('scale-100');
+      }
+    };
+
+    // Close Portfolio Modal Function
+    window.closeCityPortfolio = function() {
+      const modal = document.getElementById('portfolio-modal');
+      const card = document.getElementById('modal-card');
+      if (modal && card) {
+        modal.classList.add('opacity-0', 'pointer-events-none');
+        card.classList.remove('scale-100');
+        card.classList.add('scale-95');
+      }
+    };
+
+    // Close modal on backdrop click or ESC key
+    const modalBackdrop = document.getElementById('portfolio-modal');
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeCityPortfolio();
+      });
+    }
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeCityPortfolio();
+    });
+
+    /* ==========================================================
+       2D INTERACTIVE PACIFIC & GLOBAL GEO-RADAR MAP ENGINE
+       ========================================================== */
+    let map2DCanvas, map2DCtx, map2DW, map2DH;
+    let hoveredCityKey = null;
+    let selectedCityKey = 'honolulu';
+    let mapPulseTime = 0;
+
+    // Geographic Coordinates Map Conversion to 2D Canvas (Honolulu EXACT CENTER at 50%, 50%)
+    const HNL_LNG = -157.8583;
+    const HNL_LAT = 21.3069;
+
+    function geoToCanvas(lng, lat, w, h) {
+      // Calculate angular longitude offset relative to Honolulu (-157.86°)
+      let dLng = lng - HNL_LNG;
+      while (dLng < -180) dLng += 360;
+      while (dLng > 180) dLng -= 360;
+
+      // Longitude span: 300 degrees total field of view (Leaves generous borders on left/right)
+      const x = (w * 0.5) + (dLng / 300) * w;
+
+      // Latitude span: Honolulu (21.3°N) placed around 50% vertical center
+      // Latitude range from -45° to +75° (total 120° vertical span)
+      const y = (h * 0.5) - ((lat - HNL_LAT) / 105) * h;
+
+      return { x, y };
+    }
+
+    function init2DWorldMap() {
+      map2DCanvas = document.getElementById('world-map-2d-canvas');
+      const container = document.getElementById('globe-viewport');
+      if (!map2DCanvas || !container) return;
+
+      map2DCtx = map2DCanvas.getContext('2d');
+      const tooltip = document.getElementById('map-node-tooltip');
+      const tooltipTitle = document.getElementById('tooltip-city-name');
+      const tooltipSub = document.getElementById('tooltip-city-sub');
+
+      function resizeMapCanvas() {
+        const rect = container.getBoundingClientRect();
+        map2DW = map2DCanvas.width = rect.width || container.clientWidth || 960;
+        map2DH = map2DCanvas.height = rect.height || container.clientHeight || 500;
+      }
+      resizeMapCanvas();
+      window.addEventListener('resize', resizeMapCanvas);
+
+      // Continents with coordinates arranged for Honolulu-centered Pacific View
+      // (Asia / Eurasia on Left, Hawaii in Center, Americas on Right)
+      const continents = [
+        // 1. East Asia & Siberia (Left side)
+        [[70, 72], [90, 75], [120, 74], [145, 70], [170, 66], [180, 64], [172, 60],
+         [162, 54], [143, 53], [135, 46], [130, 42], [123, 40], [120, 33], [118, 24],
+         [109, 21], [107, 13], [101, 3], [98, 12], [90, 22], [82, 17], [76, 8],
+         [72, 19], [65, 25], [52, 28], [50, 45], [60, 62], [70, 72]],
+        // Korean Peninsula
+        [[124.5, 40.0], [126.5, 38.0], [126.8, 34.4], [129.6, 35.8], [128.8, 38.6], [130.8, 42.5], [124.5, 40.0]],
+        // Japan Archipelago
+        [[141, 43], [145, 44], [141, 41], [139, 35.5], [136, 35], [133, 34], [130.5, 31.5], [134.5, 34.5], [141, 43]],
+        // Southeast Asia Islands & Australia (Lower Left)
+        [[100, -2], [106, -6], [115, -8], [120, -8], [115, -4], [108, 2], [100, -2]],
+        [[114, -22], [122, -15], [136, -12], [148, -19], [151, -34], [144, -38], [135, -34], [116, -35], [114, -22]],
+        // 2. North America (Right side)
+        [[-168, 65], [-160, 71], [-140, 70], [-130, 68], [-120, 69], [-95, 74], [-80, 70],
+         [-65, 60], [-60, 48], [-66, 44], [-71, 42], [-74, 38], [-76, 34], [-81, 25],
+         [-82, 29], [-88, 30], [-97, 26], [-97, 19], [-88, 16], [-83, 9], [-77, 8],
+         [-84, 10], [-90, 14], [-105, 20], [-110, 23], [-115, 30], [-117, 33], [-122, 37],
+         [-124, 48], [-130, 55], [-138, 59], [-150, 60], [-162, 55], [-168, 65]],
+        // 3. South America (Lower Right side)
+        [[-76, 8], [-68, 12], [-60, 8], [-50, 0], [-35, -5], [-35, -12], [-40, -22],
+         [-48, -28], [-53, -33], [-58, -38], [-65, -45], [-68, -55], [-75, -52], [-74, -45],
+         [-72, -35], [-71, -25], [-76, -14], [-81, -5], [-78, 2], [-76, 8]],
+        // 4. Hawaiian Islands (Center Apex of World)
+        [[-160.2, 22.2], [-159.2, 21.8], [-158.0, 21.3], [-157.0, 20.8], [-156.4, 20.5],
+         [-155.5, 19.5], [-155.8, 19.8], [-157.4, 21.4], [-160.2, 22.2]]
+      ];
+
+      // Interactive Mouse / Click Tracking on Canvas
+      map2DCanvas.addEventListener('mousemove', (e) => {
+        const rect = map2DCanvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        let foundCity = null;
+        Object.keys(cityPortfolios).forEach(key => {
+          const c = cityPortfolios[key];
+          const pos = geoToCanvas(c.lng, c.lat, map2DW, map2DH);
+          const dist = Math.hypot(mx - pos.x, my - pos.y);
+          if (dist < 22) {
+            foundCity = { key, ...c, x: pos.x, y: pos.y };
+          }
+        });
+
+        if (foundCity) {
+          hoveredCityKey = foundCity.key;
+          map2DCanvas.style.cursor = 'pointer';
+          if (tooltip && tooltipTitle && tooltipSub) {
+            tooltipTitle.innerText = foundCity.cityName.toUpperCase();
+            tooltipSub.innerText = `${foundCity.cityKr} (${foundCity.title})`;
+            tooltip.style.left = `${foundCity.x}px`;
+            tooltip.style.top = `${foundCity.y}px`;
+            tooltip.style.opacity = '1';
+          }
+        } else {
+          hoveredCityKey = null;
+          map2DCanvas.style.cursor = 'crosshair';
+          if (tooltip) tooltip.style.opacity = '0';
+        }
+      });
+
+      map2DCanvas.addEventListener('mouseleave', () => {
+        hoveredCityKey = null;
+        if (tooltip) tooltip.style.opacity = '0';
+      });
+
+      map2DCanvas.addEventListener('click', (e) => {
+        const rect = map2DCanvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        Object.keys(cityPortfolios).forEach(key => {
+          const c = cityPortfolios[key];
+          const pos = geoToCanvas(c.lng, c.lat, map2DW, map2DH);
+          const dist = Math.hypot(mx - pos.x, my - pos.y);
+          if (dist < 24) {
+            openCityPortfolio(key);
+          }
+        });
+      });
+
+      window.highlight2DMapCity = function(cityKey) {
+        selectedCityKey = cityKey;
+      };
+
+      // 2D Map Render Loop
+      function render2DMap() {
+        if (!map2DCtx) return;
+        map2DCtx.clearRect(0, 0, map2DW, map2DH);
+        mapPulseTime += 0.035;
+
+        // 1. Deep Oceanic Background Gradient
+        const oceanGrad = map2DCtx.createLinearGradient(0, 0, 0, map2DH);
+        oceanGrad.addColorStop(0, '#060B12');
+        oceanGrad.addColorStop(0.5, '#0A1420');
+        oceanGrad.addColorStop(1, '#08101A');
+        map2DCtx.fillStyle = oceanGrad;
+        map2DCtx.fillRect(0, 0, map2DW, map2DH);
+
+        // 2. Latitude & Longitude Navigational Grid Lines
+        map2DCtx.strokeStyle = 'rgba(197, 166, 118, 0.08)';
+        map2DCtx.lineWidth = 1;
+
+        // Parallels (Latitude lines)
+        for (let lat = -40; lat <= 70; lat += 20) {
+          const p = geoToCanvas(HNL_LNG, lat, map2DW, map2DH);
+          map2DCtx.beginPath();
+          map2DCtx.moveTo(0, p.y);
+          map2DCtx.lineTo(map2DW, p.y);
+          map2DCtx.stroke();
+        }
+
+        // Meridians (Longitude lines relative to Honolulu center)
+        for (let d = -140; d <= 140; d += 30) {
+          const p = geoToCanvas(HNL_LNG + d, 0, map2DW, map2DH);
+          map2DCtx.beginPath();
+          map2DCtx.moveTo(p.x, 0);
+          map2DCtx.lineTo(p.x, map2DH);
+          map2DCtx.stroke();
+        }
+
+        // Center Coordinate Reticle / Meridian (Through Honolulu at EXACT Center)
+        const hnlCenterPos = geoToCanvas(HNL_LNG, HNL_LAT, map2DW, map2DH);
+        map2DCtx.save();
+        map2DCtx.strokeStyle = 'rgba(223, 192, 143, 0.35)';
+        map2DCtx.setLineDash([4, 6]);
+        // Vertical axis through Honolulu
+        map2DCtx.beginPath();
+        map2DCtx.moveTo(hnlCenterPos.x, 0);
+        map2DCtx.lineTo(hnlCenterPos.x, map2DH);
+        map2DCtx.stroke();
+        // Horizontal axis through Honolulu
+        map2DCtx.beginPath();
+        map2DCtx.moveTo(0, hnlCenterPos.y);
+        map2DCtx.lineTo(map2DW, hnlCenterPos.y);
+        map2DCtx.stroke();
+        // Concentric Range Rings centered around Honolulu
+        [70, 150, 240].forEach(r => {
+          map2DCtx.beginPath();
+          map2DCtx.arc(hnlCenterPos.x, hnlCenterPos.y, r, 0, Math.PI * 2);
+          map2DCtx.strokeStyle = 'rgba(197, 166, 118, 0.12)';
+          map2DCtx.stroke();
+        });
+        map2DCtx.restore();
+
+        // 3. Render Continents (Asia on Left, Americas on Right)
+        map2DCtx.fillStyle = '#14253B';
+        map2DCtx.strokeStyle = 'rgba(223, 192, 143, 0.42)';
+        map2DCtx.lineWidth = 1.2;
+
+        continents.forEach(poly => {
+          map2DCtx.beginPath();
+          poly.forEach((pt, idx) => {
+            const cPos = geoToCanvas(pt[0], pt[1], map2DW, map2DH);
+            if (idx === 0) map2DCtx.moveTo(cPos.x, cPos.y);
+            else map2DCtx.lineTo(cPos.x, cPos.y);
+          });
+          map2DCtx.closePath();
+          map2DCtx.fill();
+          map2DCtx.stroke();
+        });
+
+        // 4. Draw Flight & Navigation Arcs radiating from Honolulu (Center) to other 7 Hubs
+        const hnlData = cityPortfolios.honolulu;
+        const hnlPos = geoToCanvas(hnlData.lng, hnlData.lat, map2DW, map2DH);
+
+        Object.keys(cityPortfolios).forEach(key => {
+          if (key === 'honolulu') return;
+          const targetData = cityPortfolios[key];
+          const targetPos = geoToCanvas(targetData.lng, targetData.lat, map2DW, map2DH);
+
+          const midX = (hnlPos.x + targetPos.x) / 2;
+          const arcLift = Math.abs(targetPos.x - hnlPos.x) * 0.18 + 25;
+          const midY = Math.min(hnlPos.y, targetPos.y) - arcLift;
+
+          const isHighlight = (key === selectedCityKey || key === hoveredCityKey);
+
+          map2DCtx.save();
+          map2DCtx.beginPath();
+          map2DCtx.moveTo(hnlPos.x, hnlPos.y);
+          map2DCtx.quadraticCurveTo(midX, midY, targetPos.x, targetPos.y);
+
+          if (isHighlight) {
+            map2DCtx.strokeStyle = 'rgba(255, 226, 159, 0.95)';
+            map2DCtx.lineWidth = 2.4;
+            map2DCtx.shadowColor = '#FFE29F';
+            map2DCtx.shadowBlur = 14;
+          } else {
+            map2DCtx.strokeStyle = 'rgba(197, 166, 118, 0.35)';
+            map2DCtx.lineWidth = 1.3;
+            map2DCtx.setLineDash([3, 4]);
+          }
+          map2DCtx.stroke();
+          map2DCtx.restore();
+
+          // Traveling Gold Photon along each Arc
+          const photonProg = (mapPulseTime * 0.35 + key.charCodeAt(0) * 0.2) % 1;
+          const px = (1 - photonProg) * (1 - photonProg) * hnlPos.x + 2 * (1 - photonProg) * photonProg * midX + photonProg * photonProg * targetPos.x;
+          const py = (1 - photonProg) * (1 - photonProg) * hnlPos.y + 2 * (1 - photonProg) * photonProg * midY + photonProg * photonProg * targetPos.y;
+
+          map2DCtx.save();
+          map2DCtx.fillStyle = '#FFFFFF';
+          map2DCtx.shadowColor = '#DFC08F';
+          map2DCtx.shadowBlur = 8;
+          map2DCtx.beginPath();
+          map2DCtx.arc(px, py, isHighlight ? 3.2 : 1.8, 0, Math.PI * 2);
+          map2DCtx.fill();
+          map2DCtx.restore();
+        });
+
+        // 5. Draw 8 Metropolitan Hub Nodes & Official City Names
+        Object.keys(cityPortfolios).forEach(key => {
+          const c = cityPortfolios[key];
+          const pos = geoToCanvas(c.lng, c.lat, map2DW, map2DH);
+          const isSelected = (key === selectedCityKey);
+          const isHovered = (key === hoveredCityKey);
+          const isCenterHub = (key === 'honolulu');
+
+          map2DCtx.save();
+
+          // Pulsing Beacon Waves
+          const pulseR = (isCenterHub ? 8 : 5) + (Math.sin(mapPulseTime * 2.5 + c.lat) + 1) * (isCenterHub ? 9 : 6);
+          map2DCtx.beginPath();
+          map2DCtx.arc(pos.x, pos.y, pulseR, 0, Math.PI * 2);
+          map2DCtx.strokeStyle = (isSelected || isHovered || isCenterHub) ? 'rgba(255, 226, 159, 0.85)' : 'rgba(197, 166, 118, 0.4)';
+          map2DCtx.lineWidth = 1.4;
+          map2DCtx.stroke();
+
+          // Outer Ring
+          map2DCtx.beginPath();
+          map2DCtx.arc(pos.x, pos.y, isCenterHub ? 9 : (isSelected ? 7 : 5), 0, Math.PI * 2);
+          map2DCtx.strokeStyle = isCenterHub ? '#FFE29F' : '#FFFFFF';
+          map2DCtx.lineWidth = isCenterHub ? 2.0 : 1.6;
+          map2DCtx.stroke();
+
+          // Solid Inner Jewel
+          map2DCtx.beginPath();
+          map2DCtx.arc(pos.x, pos.y, isCenterHub ? 5.2 : (isSelected ? 4.2 : 2.8), 0, Math.PI * 2);
+          map2DCtx.fillStyle = (isSelected || isHovered || isCenterHub) ? '#FFE29F' : '#DFC08F';
+          map2DCtx.shadowColor = '#FFE29F';
+          map2DCtx.shadowBlur = (isSelected || isCenterHub) ? 18 : 8;
+          map2DCtx.fill();
+
+          // Real Official City Name Label
+          map2DCtx.font = isCenterHub ? '700 12px "Plus Jakarta Sans", sans-serif' : '600 11px "Plus Jakarta Sans", sans-serif';
+          map2DCtx.fillStyle = (isSelected || isHovered || isCenterHub) ? '#FFFFFF' : 'rgba(250, 248, 245, 0.9)';
+          map2DCtx.shadowColor = '#000000';
+          map2DCtx.shadowBlur = 6;
+          map2DCtx.fillText(c.cityName, pos.x + (isCenterHub ? 12 : 9), pos.y - (isCenterHub ? 8 : 6));
+
+          if (isCenterHub) {
+            map2DCtx.font = '600 9px "Plus Jakarta Sans", sans-serif';
+            map2DCtx.fillStyle = '#DFC08F';
+            map2DCtx.fillText('MASTER ANCHOR', pos.x + 12, pos.y + 6);
+          }
+
+          map2DCtx.restore();
+        });
+
+        requestAnimationFrame(render2DMap);
+      }
+      render2DMap();
+    }
+
+    // Initialize 2D Map on boot
+    function ensure2DMapBoot() {
+      init2DWorldMap();
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', ensure2DMapBoot);
+    } else {
+      ensure2DMapBoot();
+    }
+    window.addEventListener('load', ensure2DMapBoot);
+
+    /* ==========================================================
+       4. THE GREAT COMPASS INTERACTIVE GYROSCOPE & CELESTIAL PARTICLES
+       ========================================================== */
+    const compassElem = document.getElementById('compass-interactive');
+    const needleElem = document.getElementById('compass-needle');
+    const outerRing = document.getElementById('compass-outer-ring');
+    const innerRing = document.getElementById('compass-inner-ring');
+    const azimuthVal = document.getElementById('compass-azimuth-val');
+    const targetVal = document.getElementById('compass-target-val');
+    const sparkleCanvas = document.getElementById('compass-sparkle-canvas');
+    const compassHalo = document.getElementById('compass-halo');
+    let sCtx, sW, sH;
+    const CANVAS_PADDING = 140; // 나침반 외곽으로 뻗어나가는 넉넉한 여백
+
+    if (sparkleCanvas && compassElem) {
+      sCtx = sparkleCanvas.getContext('2d');
+      function resizeSparkleCanvas() {
+        const baseW = compassElem.clientWidth;
+        const baseH = compassElem.clientHeight;
+        sW = sparkleCanvas.width = baseW + CANVAS_PADDING * 2;
+        sH = sparkleCanvas.height = baseH + CANVAS_PADDING * 2;
+      }
+      resizeSparkleCanvas();
+      window.addEventListener('resize', resizeSparkleCanvas);
+    }
+
+    // Sparkle & Foam Particles Array
+    const sparks = [];
+
+    // 1. Shimmering Golden Star Particle (금빛 찬란한 별빛 가루)
+    class RadiantGoldenStar {
+      constructor(x, y, baseAngle, speedRatio) {
+        this.x = x;
+        this.y = y;
+        const speed = (2.5 + Math.random() * 5.5) * (0.9 + speedRatio * 1.6);
+        const spread = (Math.random() - 0.5) * 1.5;
+        this.vx = Math.cos(baseAngle + spread) * speed;
+        this.vy = Math.sin(baseAngle + spread) * speed;
+        this.alpha = 1.0;
+        this.decay = 0.012 + Math.random() * 0.018; // 더 멀리 퍼져나가도록 완화
+        this.size = 2.0 + Math.random() * 4.0;
+        this.spikes = Math.random() > 0.35 ? 4 : 0; // 십자성 별빛
+        this.rot = Math.random() * Math.PI;
+        this.rotSpeed = (Math.random() - 0.5) * 0.18;
+        // Palettes: Brilliant white-gold, luminous amber, 24k gold
+        const palette = ['#FFFFFF', '#FFF8E7', '#FFE29F', '#DFC08F', '#F59E0B'];
+        this.color = palette[Math.floor(Math.random() * palette.length)];
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.96;
+        this.vy *= 0.96;
+        this.rot += this.rotSpeed;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = '#FFE29F';
+        ctx.shadowBlur = 14;
+
+        if (this.spikes === 4) {
+          // 4-Point Golden Star Burst
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rot);
+          ctx.beginPath();
+          const rInner = this.size * 0.35;
+          const rOuter = this.size * 1.8;
+          for (let i = 0; i < 8; i++) {
+            const r = i % 2 === 0 ? rOuter : rInner;
+            const a = (i * Math.PI) / 4;
+            const px = Math.cos(a) * r;
+            const py = Math.sin(a) * r;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          // Soft Circular Diamond Bokeh
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+
+    // 2. Crashing Wave White Foam Spray (바위에 부서지듯 튀는 파도 물방울)
+    class CrashingWaveFoam {
+      constructor(x, y, baseAngle) {
+        this.x = x;
+        this.y = y;
+        const speed = 3.0 + Math.random() * 6.5;
+        const spread = (Math.random() - 0.5) * 1.9;
+        this.vx = Math.cos(baseAngle + spread) * speed;
+        this.vy = Math.sin(baseAngle + spread) * speed;
+        this.radius = 1.4 + Math.random() * 3.2;
+        this.alpha = 0.95;
+        this.decay = 0.014 + Math.random() * 0.022; // 밖으로 길게 튀어 오르도록 유지
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.95;
+        this.vy *= 0.95;
+        this.alpha -= this.decay;
+      }
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function emitCompassSplashes(originX, originY, baseAngle, angularVelocity) {
+      if (!sCtx) return;
+      const count = Math.min(10, Math.max(2, Math.floor(angularVelocity * 2.0)));
+      for (let i = 0; i < count; i++) {
+        sparks.push(new RadiantGoldenStar(originX, originY, baseAngle, Math.min(2.8, angularVelocity / 3.5)));
+        if (Math.random() > 0.35) {
+          sparks.push(new CrashingWaveFoam(originX, originY, baseAngle));
+        }
+      }
+    }
+
+    function renderSparks() {
+      if (sCtx && sW && sH) {
+        sCtx.clearRect(0, 0, sW, sH);
+        for (let i = sparks.length - 1; i >= 0; i--) {
+          sparks[i].update();
+          sparks[i].draw(sCtx);
+          if (sparks[i].alpha <= 0) sparks.splice(i, 1);
+        }
+      }
+      requestAnimationFrame(renderSparks);
+    }
+    renderSparks();
+
+    // 4 Cardinal Philosophies mapped to degrees
+    const compassDestinations = [
+      { min: 315, max: 45, name: "북(北) : VESSEL — 거대한 함선과 대지 주권" },
+      { min: 45, max: 135, name: "동(東) : 선구안(先見之明) — 시대를 앞서가는 통찰" },
+      { min: 135, max: 225, name: "남(南) : BOARD — 파도를 가르는 결단과 추진력" },
+      { min: 225, max: 315, name: "서(西) : 회복(回復) — 흔들림 없는 회복탄력성과 영속성" }
+    ];
+
+    let currentRotation = 0;
+    let targetRotation = 0;
+    let prevAngle = 0;
+    let isCompassHovered = false;
+
+    if (compassElem && needleElem) {
+      compassElem.addEventListener('mousemove', (e) => {
+        isCompassHovered = true;
+        const rect = compassElem.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+
+        const deltaX = e.clientX - centerX;
+        const deltaY = e.clientY - centerY;
+
+        const angleRad = Math.atan2(deltaY, deltaX);
+        let angleDeg = angleRad * (180 / Math.PI) + 90;
+        if (angleDeg < 0) angleDeg += 360;
+
+        // Calculate angular velocity (회전 속도)
+        let angleDiff = Math.abs(angleDeg - prevAngle);
+        if (angleDiff > 180) angleDiff = 360 - angleDiff;
+        prevAngle = angleDeg;
+
+        targetRotation = angleDeg;
+
+        // Dynamic Glow Intensification: 회전할 때 황금빛이 극대화
+        if (angleDiff > 1.2) {
+          compassElem.classList.add('compass-spinning-active');
+          if (compassHalo) {
+            compassHalo.style.opacity = Math.min(0.95, 0.45 + angleDiff * 0.08);
+            compassHalo.style.transform = `scale(${1 + Math.min(0.25, angleDiff * 0.02)})`;
+          }
+        }
+
+        // Astrolabe Rings Counter-Rotation
+        if (outerRing) outerRing.style.transform = `rotate(${-angleDeg * 0.45}deg)`;
+        if (innerRing) innerRing.style.transform = `rotate(${angleDeg * 0.75}deg)`;
+
+        // Telemetry Azimuth Update
+        if (azimuthVal) azimuthVal.innerText = `${angleDeg.toFixed(1).padStart(5, '0')}°`;
+
+        // Telemetry Target Locking (4대 철학 연동)
+        if (targetVal) {
+          const match = compassDestinations.find(d => 
+            (d.min > d.max) ? (angleDeg >= d.min || angleDeg < d.max) : (angleDeg >= d.min && angleDeg < d.max)
+          );
+          targetVal.innerText = match ? match.name : "북(北) : VESSEL — 거대한 함선과 대지 주권";
+        }
+
+        // Emit Golden Sparks and Foam Particles from North Needle Tip
+        const rad = (angleDeg - 90) * (Math.PI / 180);
+        const compassRadius = compassElem.clientWidth / 2;
+        const tipDist = compassRadius * 0.84;
+        
+        const canvasCenterX = sW / 2;
+        const canvasCenterY = sH / 2;
+
+        const tipX = canvasCenterX + Math.cos(rad) * tipDist;
+        const tipY = canvasCenterY + Math.sin(rad) * tipDist;
+        emitCompassSplashes(tipX, tipY, rad, angleDiff);
+
+        if (angleDiff > 2.0) {
+          emitCompassSplashes(canvasCenterX, canvasCenterY, rad + Math.PI, angleDiff * 0.6);
+        }
+      });
+
+      compassElem.addEventListener('mouseleave', () => {
+        isCompassHovered = false;
+        targetRotation = 0;
+        compassElem.classList.remove('compass-spinning-active');
+        if (compassHalo) {
+          compassHalo.style.opacity = '0.3';
+          compassHalo.style.transform = 'scale(1)';
+        }
+        if (outerRing) outerRing.style.transform = 'rotate(0deg)';
+        if (innerRing) innerRing.style.transform = 'rotate(0deg)';
+        if (azimuthVal) azimuthVal.innerText = '000.0° N';
+        if (targetVal) targetVal.innerText = '북(北) : VESSEL — 거대한 함선의 대지 주권';
+      });
+
+      // Smooth Needle Physics Loop
+      function updateNeedle() {
+        if (!isCompassHovered) {
+          // Subtle natural wandering of needle when idle
+          targetRotation = Math.sin(Date.now() * 0.0015) * 4;
+        } else {
+          // Gradually dim active flare if mouse halts while still inside
+          if (compassHalo && parseFloat(compassHalo.style.opacity) > 0.4) {
+            compassHalo.style.opacity = (parseFloat(compassHalo.style.opacity) * 0.94).toFixed(3);
+          }
+        }
+        currentRotation += (targetRotation - currentRotation) * 0.18;
+        needleElem.style.transform = `rotate(${currentRotation}deg)`;
+        requestAnimationFrame(updateNeedle);
+      }
+      updateNeedle();
+    }
+
+    /* ==========================================================
+       6. OCEAN VORTEX 3D SWELL CAROUSEL & FOAM WAVES
+       ========================================================== */
+    let currentVortexIndex = 0;
+    const totalVortexNodes = 5;
+    let vortexAngle = 0;
+    let isVortexAutoplaying = true;
+    let vortexAutoplayTimer = null;
+
+    const vortexTrack = document.getElementById('vortex-track');
+    const waveNodes = document.querySelectorAll('.wave-node-card');
+    const vortexDots = document.querySelectorAll('.vortex-dot');
+    const vortexCounter = document.getElementById('vortex-counter');
+    const vortexPlayBtnText = document.getElementById('vortex-play-text');
+    const vortexPlayIcon = document.getElementById('vortex-play-icon');
+
+    // Layout the 5 cards in a 3D cylindrical wave carousel
+    function updateVortexLayout() {
+      const isMobile = window.innerWidth < 640;
+      const radius = isMobile ? 260 : 420; // 3D orbit radius
+      const angleStep = (360 / totalVortexNodes);
+
+      waveNodes.forEach((card, idx) => {
+        // Calculate relative position to active node
+        const theta = (idx * angleStep) + vortexAngle;
+        const rad = (theta * Math.PI) / 180;
+
+        // Mathematical 3D orbital projection with sinusoidal wave undulation
+        const waveElevation = Math.sin(rad * 2 + Date.now() * 0.002) * 18;
+        const z = Math.cos(rad) * radius;
+        const x = Math.sin(rad) * radius;
+
+        // Depth-based scaling and opacity
+        const normalizedZ = (z + radius) / (radius * 2); // 0 (back) to 1 (front)
+        const scale = 0.72 + (normalizedZ * 0.32);
+        const opacity = 0.28 + (normalizedZ * 0.72);
+        const blur = (1 - normalizedZ) * 4;
+
+        card.style.transform = `translate3d(${x}px, ${waveElevation}px, ${z}px) scale(${scale})`;
+        card.style.opacity = opacity;
+        card.style.filter = `blur(${blur}px)`;
+        card.style.zIndex = Math.round(normalizedZ * 100);
+
+        // Highlight the frontmost active card
+        const isCurrent = idx === currentVortexIndex;
+        if (isCurrent) {
+          card.classList.add('active-node');
+          card.style.filter = 'none';
+        } else {
+          card.classList.remove('active-node');
+        }
+      });
+
+      // Update dots indicator
+      vortexDots.forEach((dot, dIdx) => {
+        if (dIdx === currentVortexIndex) {
+          dot.className = "vortex-dot w-9 h-1.5 rounded-full bg-sand-brightGold shadow-[0_0_10px_#dfc08f] transition-all duration-300";
+        } else {
+          dot.className = "vortex-dot w-3 h-1.5 rounded-full bg-sand-gold/25 hover:bg-sand-gold/60 transition-all duration-300";
+        }
+      });
+
+      if (vortexCounter) {
+        vortexCounter.innerText = `0${currentVortexIndex + 1} / 05`;
+      }
+    }
+
+    window.selectVortexNode = function(index) {
+      currentVortexIndex = (index + totalVortexNodes) % totalVortexNodes;
+      vortexAngle = -currentVortexIndex * (360 / totalVortexNodes);
+      updateVortexLayout();
+      resetVortexAutoplay();
+    };
+
+    window.rotateVortexWave = function(direction) {
+      currentVortexIndex = (currentVortexIndex + direction + totalVortexNodes) % totalVortexNodes;
+      vortexAngle = -currentVortexIndex * (360 / totalVortexNodes);
+      updateVortexLayout();
+      resetVortexAutoplay();
+    };
+
+    window.toggleVortexAutoplay = function() {
+      isVortexAutoplaying = !isVortexAutoplaying;
+      if (vortexPlayBtnText && vortexPlayIcon) {
+        if (isVortexAutoplaying) {
+          vortexPlayIcon.innerText = "⏸";
+          vortexPlayBtnText.innerText = "WAVE FLOW";
+          startVortexAutoplay();
+        } else {
+          vortexPlayIcon.innerText = "▶";
+          vortexPlayBtnText.innerText = "PAUSED";
+          clearInterval(vortexAutoplayTimer);
+        }
+      }
+    };
+
+    function startVortexAutoplay() {
+      clearInterval(vortexAutoplayTimer);
+      vortexAutoplayTimer = setInterval(() => {
+        if (isVortexAutoplaying) {
+          currentVortexIndex = (currentVortexIndex + 1) % totalVortexNodes;
+          vortexAngle = -currentVortexIndex * (360 / totalVortexNodes);
+          updateVortexLayout();
+        }
+      }, 4500);
+    }
+
+    function resetVortexAutoplay() {
+      if (isVortexAutoplaying) {
+        startVortexAutoplay();
+      }
+    }
+
+    // Touch and swipe gestures for mobile on Vortex
+    const vortexZone = document.getElementById('vortex-interactive-zone');
+    let touchStartX = 0;
+    if (vortexZone) {
+      vortexZone.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+
+      vortexZone.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchEndX - touchStartX;
+        if (Math.abs(diff) > 40) {
+          rotateVortexWave(diff < 0 ? 1 : -1);
+        }
+      }, { passive: true });
+    }
+
+    // Continuous Subtle Wave Motion Loop
+    function continuousWaveUndulation() {
+      updateVortexLayout();
+      requestAnimationFrame(continuousWaveUndulation);
+    }
+
+    // Background Canvas Fluid Wave Ripple Lines
+    function initVortexWaveCanvas() {
+      const vCanvas = document.getElementById('vortex-waves-canvas');
+      if (!vCanvas) return;
+      const vCtx = vCanvas.getContext('2d');
+      let vW = vCanvas.width = vCanvas.parentElement.clientWidth;
+      let vH = vCanvas.height = vCanvas.parentElement.clientHeight;
+
+      window.addEventListener('resize', () => {
+        if (vCanvas.parentElement) {
+          vW = vCanvas.width = vCanvas.parentElement.clientWidth;
+          vH = vCanvas.height = vCanvas.parentElement.clientHeight;
+        }
+      });
+
+      let waveStep = 0;
+      function renderFluidWaves() {
+        vCtx.clearRect(0, 0, vW, vH);
+        waveStep += 0.015;
+
+        // Render 3 flowing sinusoidal tide contours
+        for (let j = 0; j < 3; j++) {
+          vCtx.beginPath();
+          vCtx.strokeStyle = j === 0 ? 'rgba(223, 192, 143, 0.12)' : 'rgba(22, 42, 69, 0.45)';
+          vCtx.lineWidth = 1.2;
+
+          const baseHeight = vH * (0.35 + j * 0.18);
+          for (let x = 0; x <= vW; x += 15) {
+            const y = baseHeight + 
+                      Math.sin(x * 0.005 + waveStep + j) * 35 + 
+                      Math.cos(x * 0.002 + waveStep * 0.7) * 20;
+            if (x === 0) vCtx.moveTo(x, y);
+            else vCtx.lineTo(x, y);
+          }
+          vCtx.stroke();
+        }
+
+        requestAnimationFrame(renderFluidWaves);
+      }
+      renderFluidWaves();
+    }
+
+    // Initialize Vortex on load
+    window.addEventListener('load', () => {
+      initVortexWaveCanvas();
+      startVortexAutoplay();
+      continuousWaveUndulation();
+      initPacificRealisticOceanCanvas();
+      initWorldviewBreachingWhaleCanvas();
+      initInteractiveOceanGrid();
+      initScrollWaveFoamCanvas();
+      initNavigationScrollspy();
+    });
+
+    /* ==========================================================
+       DYNAMIC NAVIGATION SCROLLSPY (메인페이지 소등 & 스크롤 위치 인터랙티브 점등 및 확대)
+       ========================================================== */
+    function initNavigationScrollspy() {
+      const navLinks = document.querySelectorAll('.nav-link');
+      const trackedSections = [
+        document.getElementById('ocean-grid-business'),
+        document.getElementById('compass-heritage'),
+        document.getElementById('worldview'),
+        document.getElementById('global-grid')
+      ];
+
+      function updateActiveNav() {
+        const scrollY = window.scrollY;
+        const heroSection = document.getElementById('hero-sanctuary');
+        const heroBottom = heroSection ? heroSection.offsetTop + heroSection.offsetHeight : 600;
+
+        // 1. 가장 첫 번째 메인 페이지(Hero)를 볼 때는 모든 메뉴 불 끄기 및 기본 크기 복귀
+        if (scrollY < heroBottom - 200) {
+          navLinks.forEach(link => {
+            link.classList.remove('text-sand-brightGold', 'scale-110', 'font-bold', 'drop-shadow-[0_0_8px_rgba(223,192,143,0.8)]');
+            link.classList.add('text-sand-ecru/70', 'scale-100', 'font-normal');
+          });
+          return;
+        }
+
+        // 2. 사용자가 머물고 있는 현재 섹션 탐지 (화면 중앙 기준)
+        const viewportCenter = scrollY + window.innerHeight * 0.4;
+        let activeId = null;
+
+        trackedSections.forEach(section => {
+          if (!section) return;
+          const top = section.offsetTop;
+          const height = section.offsetHeight;
+          if (viewportCenter >= top && viewportCenter < top + height) {
+            activeId = section.id;
+          }
+        });
+
+        // 3. 해당 메뉴 점등 및 크기 확대 효과 적용
+        navLinks.forEach(link => {
+          const targetId = link.getAttribute('data-nav-target');
+          if (activeId && targetId === activeId) {
+            link.classList.remove('text-sand-ecru/70', 'scale-100', 'font-normal');
+            link.classList.add('text-sand-brightGold', 'scale-110', 'font-bold', 'drop-shadow-[0_0_8px_rgba(223,192,143,0.8)]');
+          } else {
+            link.classList.remove('text-sand-brightGold', 'scale-110', 'font-bold', 'drop-shadow-[0_0_8px_rgba(223,192,143,0.8)]');
+            link.classList.add('text-sand-ecru/70', 'scale-100', 'font-normal');
+          }
+        });
+      }
+
+      window.addEventListener('scroll', updateActiveNav, { passive: true });
+      updateActiveNav();
+    }
+
+    /* ==========================================================
+       SCROLL-TRIGGERED BREAKING WHITE WAVE FOAM SIMULATOR
+       ========================================================== */
+    function initScrollWaveFoamCanvas() {
+      const canvas = document.getElementById('scroll-wave-foam-canvas');
+      const section = document.getElementById('ocean-grid-business');
+      if (!canvas || !section) return;
+
+      const ctx = canvas.getContext('2d');
+      let w = (canvas.width = section.clientWidth);
+      let h = (canvas.height = 176);
+
+      window.addEventListener('resize', () => {
+        if (section && canvas) {
+          w = canvas.width = section.clientWidth;
+          h = canvas.height = 176;
+        }
+      });
+
+      // Subtle Ambient Ocean Foam & Spray Engine (Always On & Soft Backdrop)
+      const foamParticles = [];
+      const sprayJets = [];
+
+      class AmbientFoamBubble {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = h * (0.45 + Math.random() * 0.55);
+          this.vx = (Math.random() - 0.5) * 0.8;
+          this.vy = -(0.3 + Math.random() * 0.9);
+          this.radius = 1.2 + Math.random() * 2.8;
+          this.alpha = 0.2 + Math.random() * 0.35; // 보일 듯 말 듯 은은한 투명도
+          this.decay = 0.004 + Math.random() * 0.008;
+          this.wobble = Math.random() * Math.PI * 2;
+        }
+        update() {
+          this.wobble += 0.04;
+          this.x += this.vx + Math.sin(this.wobble) * 0.4;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+          if (this.alpha <= 0 || this.y < 0) {
+            this.reset();
+          }
+        }
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.alpha);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = 'rgba(223, 192, 143, 0.4)';
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      class AmbientMistSpray {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = h * (0.6 + Math.random() * 0.4);
+          this.vx = (Math.random() - 0.5) * 1.2;
+          this.vy = -(0.6 + Math.random() * 1.4);
+          this.radius = 0.8 + Math.random() * 1.8;
+          this.alpha = 0.15 + Math.random() * 0.25;
+          this.decay = 0.006 + Math.random() * 0.01;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+          if (this.alpha <= 0 || this.y < 0) {
+            this.reset();
+          }
+        }
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.alpha);
+          ctx.fillStyle = '#FAF8F5';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Populate subtle ambient particles
+      for (let i = 0; i < 65; i++) foamParticles.push(new AmbientFoamBubble());
+      for (let i = 0; i < 40; i++) sprayJets.push(new AmbientMistSpray());
+
+      let waveStep = 0;
+      function renderScrollWaveFoam() {
+        ctx.clearRect(0, 0, w, h);
+        waveStep += 0.02;
+
+        // Gentle Ambient Crest Ridge at the boundary
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(0, h);
+
+        for (let x = 0; x <= w; x += 15) {
+          const sinVal = Math.sin(x * 0.008 + waveStep) * Math.cos(x * 0.004 - waveStep * 0.6);
+          const y = h - (6 + (sinVal + 1) * 0.5 * 10);
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.lineTo(w, h);
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.fill();
+        ctx.restore();
+
+        // Render ambient foam bubbles
+        foamParticles.forEach(b => {
+          b.update();
+          b.draw(ctx);
+        });
+
+        // Render ambient mist spray
+        sprayJets.forEach(s => {
+          s.update();
+          s.draw(ctx);
+        });
+
+        requestAnimationFrame(renderScrollWaveFoam);
+      }
+      renderScrollWaveFoam();
+    }
+
+    /* ==========================================================
+       THE OCEAN GRID: INTERACTIVE PARAMETRIC WAVE & LATTICE CANVAS
+       ========================================================== */
+    let gridInteractiveMode = 'default';
+    const bridgeVesselName = document.getElementById('bridge-vessel-name');
+    const bridgeCommandStatus = document.getElementById('bridge-command-status');
+    const hudHeading = document.getElementById('hud-heading');
+    const hudAnchorage = document.getElementById('hud-anchorage');
+    const hudDeployment = document.getElementById('hud-deployment');
+    const hudPropulsion = document.getElementById('hud-propulsion');
+
+    window.setGridMode = function(mode) {
+      gridInteractiveMode = mode;
+
+      if (mode === 'realestate') {
+        if (bridgeVesselName) bridgeVesselName.innerText = "01: JOSIAH LIGHTHOUSE";
+        if (bridgeCommandStatus) bridgeCommandStatus.innerText = "GLOBAL TROPHY REAL ESTATE SQUADRON • MISSION LOCK";
+        if (hudHeading) hudHeading.innerText = "환태평양 슈퍼프라임 대지 랜드마크 개발";
+        if (hudAnchorage) hudAnchorage.innerText = "Honolulu Apex Citadel";
+        if (hudDeployment) hudDeployment.innerText = "HNL, NYC, LAS, TYO, OSA, SEL, HKG, SIN";
+        if (hudPropulsion) hudPropulsion.innerText = "대지 주권 자본 & 영구 자연석 건축 공학 (Bedrock Capital)";
+      } else if (mode === 'oceanhearts') {
+        if (bridgeVesselName) bridgeVesselName.innerText = "02: OCEAN HEARTS";
+        if (bridgeCommandStatus) bridgeCommandStatus.innerText = "HAUTE COUTURE & SPATIAL ATELIER • EMOTIONAL RADIANCE";
+        if (hudHeading) hudHeading.innerText = "오뜨 꾸뛰르 컬렉션, 럭셔리 마린 뷰티, 플래그십 공간 큐레이션";
+        if (hudAnchorage) hudAnchorage.innerText = "S&P Runway Atelier";
+        if (hudDeployment) hudDeployment.innerText = "HNL, ROM, PAR, TYO, SEL";
+        if (hudPropulsion) hudPropulsion.innerText = "감각 미학 큐레이션 자본 & 독점 포뮬레이션 (Aesthetic Engine)";
+      } else if (mode === 'seoulline') {
+        if (bridgeVesselName) bridgeVesselName.innerText = "03: SEOUL LINE";
+        if (bridgeCommandStatus) bridgeCommandStatus.innerText = "K-POP & GLOBAL MEDIA CAPITAL MEGA FUND";
+        if (hudHeading) hudHeading.innerText = "글로벌 스타디움 K-POP 월드투어 제작 & 블록버스터 영화/시리즈 IP 펀딩";
+        if (hudAnchorage) hudAnchorage.innerText = "Seoul Entertainment HUB";
+        if (hudDeployment) hudDeployment.innerText = "SEL, LOS, LON";
+        if (hudPropulsion) hudPropulsion.innerText = "글로벌 미디어 메가펀드 & 차세대 엔터테크 (Culture Surge)";
+      } else if (mode === 'coral') {
+        if (bridgeVesselName) bridgeVesselName.innerText = "04: Coral LLC";
+        if (bridgeCommandStatus) bridgeCommandStatus.innerText = "NOCTURNAL ECOSYSTEM & MUSIC PRODUCING";
+        if (hudHeading) hudHeading.innerText = "4대 메가시티 최상위 하이퍼 클럽 운영 & 글로벌 음악 페스티벌 기획";
+        if (hudAnchorage) hudAnchorage.innerText = "T&S Music Apex";
+        if (hudDeployment) hudDeployment.innerText = "TYO, SEL, HKG, NYC";
+        if (hudPropulsion) hudPropulsion.innerText = "사운드 프로듀싱 & 잠들지 않는 도시 에너지 (Nocturnal Beat)";
+      }
+    };
+
+    window.resetGridMode = function() {
+      gridInteractiveMode = 'default';
+      if (bridgeVesselName) {
+        bridgeVesselName.innerText = "L-OCEAN INTERNATIONAL";
+      }
+      if (bridgeCommandStatus) {
+        bridgeCommandStatus.innerText = "ALL 4 TASK FORCE SQUADRONS STANDBY • READY FOR EXECUTIVE ORDERS";
+      }
+      if (hudHeading) {
+        hudHeading.innerText = "글로벌 부동산 & 문화 자본의 영구적 결집";
+      }
+      if (hudAnchorage) {
+        hudAnchorage.innerText = "HONOLULU APEX • PACIFIC HEADQUARTERS";
+      }
+      if (hudDeployment) {
+        hudDeployment.innerText = "HNL, NYC, LAS, SEL, TYO, OSA, HKG, SIN";
+      }
+      if (hudPropulsion) {
+        hudPropulsion.innerText = "대지 자산 • 미학 큐레이션 • 메가 IP 펀드 • 나이트라이프";
+      }
+    };
+
+    window.toggleCardPopup = function(moduleNum) {
+      const card = document.getElementById(`card-module-${moduleNum}`);
+      if (!card) return;
+      
+      // Dramatic pop-up bounce animation on click
+      card.classList.add('scale-105', '-translate-y-6', 'ring-4', 'ring-sand-brightGold/60');
+      setTimeout(() => {
+        card.classList.remove('scale-105', '-translate-y-6', 'ring-4', 'ring-sand-brightGold/60');
+      }, 700);
+
+      if (moduleNum === 1) setGridMode('realestate');
+      else if (moduleNum === 2) setGridMode('oceanhearts');
+      else if (moduleNum === 3) setGridMode('seoulline');
+      else if (moduleNum === 4) setGridMode('coral');
+    };
+
+    function initInteractiveOceanGrid() {
+      const canvas = document.getElementById('interactive-ocean-grid-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const section = document.getElementById('ocean-grid-business');
+
+      let w = (canvas.width = section.clientWidth);
+      let h = (canvas.height = section.clientHeight);
+
+      window.addEventListener('resize', () => {
+        if (section) {
+          w = canvas.width = section.clientWidth;
+          h = canvas.height = section.clientHeight;
+        }
+      });
+
+      // Mouse Pointer Tracking within Section
+      let mouse = { x: w * 0.5, y: h * 0.45, active: false, radius: 240 };
+
+      section.addEventListener('mousemove', (e) => {
+        const rect = section.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
+      });
+
+      section.addEventListener('mouseleave', () => {
+        mouse.active = false;
+      });
+
+      section.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+          const rect = section.getBoundingClientRect();
+          mouse.x = e.touches[0].clientX - rect.left;
+          mouse.y = e.touches[0].clientY - rect.top;
+          mouse.active = true;
+        }
+      }, { passive: true });
+
+      const cols = 36;
+      const rows = 24;
+      let gridTime = 0;
+
+      // Realistic Ship Bow Wave & Spray Particles
+      const bowSpray = [];
+      for (let i = 0; i < 40; i++) {
+        bowSpray.push({
+          x: w * 0.5 + (Math.random() - 0.5) * 60,
+          y: h * 0.75 + Math.random() * 40,
+          vx: (Math.random() - 0.5) * 3,
+          vy: Math.random() * 2 + 1,
+          size: 1 + Math.random() * 2.5,
+          alpha: Math.random() * 0.6
+        });
+      }
+
+      function renderOceanGridLattice() {
+        ctx.clearRect(0, 0, w, h);
+        gridTime += 0.028;
+
+        const cellW = w / cols;
+        const cellH = h / rows;
+
+        // 1. Draw Majestic Flagship Prow (Vessel Keel & Hull Outlines) in the deep backdrop
+        ctx.save();
+        const shipProwX = w * 0.5;
+        const shipProwY = h * 0.35;
+        const shipBottomY = h * 0.98;
+
+        // Luminous Bow Wave V-Wake (거대한 함선의 V자 뱃길 포말)
+        ctx.beginPath();
+        ctx.moveTo(shipProwX, shipProwY);
+        ctx.lineTo(w * 0.05, shipBottomY);
+        ctx.lineTo(w * 0.95, shipBottomY);
+        ctx.closePath();
+        const hullGrad = ctx.createLinearGradient(shipProwX, shipProwY, shipProwX, shipBottomY);
+        hullGrad.addColorStop(0, 'rgba(223, 192, 143, 0.08)');
+        hullGrad.addColorStop(0.5, 'rgba(22, 42, 69, 0.25)');
+        hullGrad.addColorStop(1, 'rgba(6, 11, 18, 0.65)');
+        ctx.fillStyle = hullGrad;
+        ctx.fill();
+
+        // Hull Keel Center Beam
+        ctx.beginPath();
+        ctx.moveTo(shipProwX, shipProwY - 20);
+        ctx.lineTo(shipProwX, shipBottomY);
+        ctx.strokeStyle = 'rgba(223, 192, 143, 0.35)';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // V-Cut Bow Waves
+        ctx.beginPath();
+        ctx.moveTo(shipProwX, shipProwY);
+        ctx.lineTo(0, shipBottomY);
+        ctx.moveTo(shipProwX, shipProwY);
+        ctx.lineTo(w, shipBottomY);
+        ctx.strokeStyle = 'rgba(244, 239, 230, 0.25)';
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
+        ctx.restore();
+
+        // 2. Calculate dynamic nodes with ocean wave physics & ship surge warp
+        const nodes = [];
+        for (let r = 0; r <= rows; r++) {
+          nodes[r] = [];
+          for (let c = 0; c <= cols; c++) {
+            let origX = c * cellW;
+            let origY = r * cellH;
+
+            // Natural Ocean Wave Swell displacement
+            const waveFreqX = 0.045;
+            const waveFreqY = 0.055;
+            let swellOffset = Math.sin(c * waveFreqX + gridTime) * 16 +
+                              Math.cos(r * waveFreqY + gridTime * 0.9) * 14;
+
+            // Mode Multipliers
+            if (gridInteractiveMode === 'matrix') swellOffset *= 1.8;
+            if (gridInteractiveMode === 'acquisition') swellOffset = Math.sin(c * 0.12 - gridTime * 2.5) * 10;
+            if (gridInteractiveMode === 'heritage') swellOffset *= 0.6; // Solid bedrock
+
+            let curX = origX;
+            let curY = origY + swellOffset;
+
+            // Cursor and Ship Bow Wave Ripple
+            if (mouse.active) {
+              const dx = curX - mouse.x;
+              const dy = curY - mouse.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+
+              if (dist < mouse.radius) {
+                const force = (1 - dist / mouse.radius);
+                const pushAngle = Math.atan2(dy, dx);
+                const pushDist = Math.sin(dist * 0.04 - gridTime * 3) * 30 * force;
+                curX += Math.cos(pushAngle) * pushDist;
+                curY += Math.sin(pushAngle) * pushDist;
+              }
+            }
+
+            nodes[r][c] = { x: curX, y: curY, wave: swellOffset };
+          }
+        }
+
+        // Draw Horizontal Grid Strings
+        for (let r = 0; r <= rows; r++) {
+          ctx.beginPath();
+          for (let c = 0; c <= cols; c++) {
+            const pt = nodes[r][c];
+            if (c === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.strokeStyle = gridInteractiveMode === 'matrix' 
+            ? 'rgba(223, 192, 143, 0.28)' 
+            : 'rgba(197, 166, 118, 0.09)';
+          ctx.lineWidth = gridInteractiveMode === 'matrix' ? 1.5 : 0.8;
+          ctx.stroke();
+        }
+
+        // Draw Vertical Grid Strings
+        for (let c = 0; c <= cols; c++) {
+          ctx.beginPath();
+          for (let r = 0; r <= rows; r++) {
+            const pt = nodes[r][c];
+            if (r === 0) ctx.moveTo(pt.x, pt.y);
+            else ctx.lineTo(pt.x, pt.y);
+          }
+          ctx.strokeStyle = gridInteractiveMode === 'acquisition'
+            ? 'rgba(244, 239, 230, 0.22)'
+            : 'rgba(197, 166, 118, 0.07)';
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+        }
+
+        // Luminous Grid Coordinates
+        for (let r = 1; r < rows; r += 2) {
+          for (let c = 1; c < cols; c += 2) {
+            const pt = nodes[r][c];
+            const isNearMouse = mouse.active && Math.hypot(pt.x - mouse.x, pt.y - mouse.y) < 150;
+
+            if (isNearMouse || gridInteractiveMode === 'matrix') {
+              ctx.save();
+              ctx.fillStyle = isNearMouse ? '#DFC08F' : 'rgba(223, 192, 143, 0.7)';
+              ctx.shadowColor = '#DFC08F';
+              ctx.shadowBlur = isNearMouse ? 12 : 5;
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, isNearMouse ? 2.8 : 1.3, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+        }
+
+        // Render Bow Spray Particles
+        bowSpray.forEach(sp => {
+          sp.y += sp.vy;
+          sp.x += sp.vx;
+          sp.alpha -= 0.008;
+          if (sp.alpha <= 0 || sp.y > h) {
+            sp.x = w * 0.5 + (Math.random() - 0.5) * 80;
+            sp.y = h * 0.45;
+            sp.alpha = 0.4 + Math.random() * 0.4;
+          }
+          ctx.save();
+          ctx.fillStyle = `rgba(255, 255, 255, ${sp.alpha})`;
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        requestAnimationFrame(renderOceanGridLattice);
+      }
+      renderOceanGridLattice();
+    }
+
+    function initWorldviewBreachingWhaleCanvas() {
+      const bCanvas = document.getElementById('worldview-whale-canvas');
+      if (!bCanvas) return;
+      const ctx = bCanvas.getContext('2d');
+      let w = (bCanvas.width = bCanvas.parentElement.clientWidth);
+      let h = (bCanvas.height = bCanvas.parentElement.clientHeight);
+
+      window.addEventListener('resize', () => {
+        if (bCanvas.parentElement) {
+          w = bCanvas.width = bCanvas.parentElement.clientWidth;
+          h = bCanvas.height = bCanvas.parentElement.clientHeight;
+        }
+      });
+
+      const splashParticles = [];
+      const whale = {
+        active: false,
+        x: w * 0.72,
+        y: h * 0.8,
+        progress: 0,
+        angle: 0,
+        scale: 0.85,
+        timer: 60
+      };
+
+      function createSplash(x, y, count, power) {
+        for (let i = 0; i < count; i++) {
+          splashParticles.push({
+            x: x + (Math.random() - 0.5) * 30,
+            y: y,
+            vx: (Math.random() - 0.5) * 6 * power,
+            vy: -(3 + Math.random() * 6 * power),
+            radius: 1 + Math.random() * 2.5,
+            alpha: 0.9,
+            gravity: 0.16,
+            decay: 0.015 + Math.random() * 0.02
+          });
+        }
+      }
+
+      let waveTime = 0;
+      function animateBreachingScene() {
+        ctx.clearRect(0, 0, w, h);
+        waveTime += 0.03;
+
+        const waterY = h * 0.65;
+
+        if (!whale.active) {
+          whale.timer--;
+          if (whale.timer <= 0) {
+            whale.active = true;
+            whale.progress = 0;
+            whale.x = w * (0.62 + Math.random() * 0.15);
+            whale.scale = Math.min(1.0, Math.max(0.65, w / 1000));
+          }
+        } else {
+          whale.progress += 0.011;
+          const p = whale.progress;
+          whale.y = waterY - Math.sin(p * Math.PI) * (h * 0.52);
+          whale.angle = -0.55 + p * 1.2;
+
+          if (p > 0.08 && p < 0.13) {
+            createSplash(whale.x - 30, waterY, 6, 1.2);
+          }
+          if (p > 0.85 && p < 0.95) {
+            createSplash(whale.x + 80, waterY, 12, 1.6);
+          }
+          if (whale.progress >= 1.0) {
+            whale.active = false;
+            whale.timer = 180 + Math.random() * 140;
+          }
+        }
+
+        if (whale.active) {
+          ctx.save();
+          ctx.translate(whale.x, whale.y);
+          ctx.rotate(whale.angle);
+          ctx.scale(whale.scale, whale.scale);
+
+          ctx.shadowColor = '#DFC08F';
+          ctx.shadowBlur = 12;
+
+          ctx.beginPath();
+          ctx.moveTo(110, -5);
+          ctx.bezierCurveTo(90, 28, 40, 42, -10, 36);
+          ctx.bezierCurveTo(-60, 30, -100, 16, -140, 4);
+          ctx.quadraticCurveTo(-180, 20, -210, 45);
+          ctx.quadraticCurveTo(-190, 0, -165, -2);
+          ctx.quadraticCurveTo(-190, -4, -210, -45);
+          ctx.quadraticCurveTo(-180, -20, -140, -4);
+          ctx.bezierCurveTo(-90, -22, -30, -32, 20, -30);
+          ctx.bezierCurveTo(60, -28, 90, -18, 110, -5);
+          ctx.closePath();
+
+          const wGrad = ctx.createLinearGradient(-150, -30, 110, 30);
+          wGrad.addColorStop(0, '#162A45');
+          wGrad.addColorStop(0.5, '#284366');
+          wGrad.addColorStop(0.85, '#DFC08F');
+          wGrad.addColorStop(1, '#FAF8F5');
+          ctx.fillStyle = wGrad;
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.65)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+
+          ctx.beginPath();
+          ctx.moveTo(15, 12);
+          ctx.bezierCurveTo(5, 45, -20, 85, -45, 105);
+          ctx.bezierCurveTo(-38, 85, -5, 45, 30, 18);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(244, 239, 230, 0.5)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(223, 192, 143, 0.7)';
+          ctx.stroke();
+
+          ctx.restore();
+        }
+
+        const waveCount = 2;
+        for (let l = 0; l < waveCount; l++) {
+          ctx.beginPath();
+          ctx.moveTo(0, h);
+
+          const step = 6;
+          for (let x = 0; x <= w; x += step) {
+            const freq = 0.006 + l * 0.003;
+            const speed = waveTime * (1.2 + l * 0.5);
+            const sinVal = Math.sin(x * freq + speed);
+            const steep = Math.pow((sinVal + 1) / 2, 2.0) * 2 - 1;
+            const y = waterY + l * 18 + steep * (14 + l * 8);
+
+            if (x === 0) ctx.lineTo(x, y);
+            else ctx.lineTo(x, y);
+
+            if (steep > 0.5) {
+              const fInt = (steep - 0.5) / 0.5;
+              ctx.save();
+              ctx.fillStyle = `rgba(255, 255, 255, ${0.45 * fInt})`;
+              ctx.shadowColor = '#FFFFFF';
+              ctx.shadowBlur = 6;
+              ctx.fillRect(x - step, y - 1, step * 1.5, 3 + fInt * 4);
+              ctx.restore();
+            }
+          }
+
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fillStyle = l === 0 ? 'rgba(15, 30, 49, 0.65)' : 'rgba(10, 20, 32, 0.85)';
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+
+        for (let i = splashParticles.length - 1; i >= 0; i--) {
+          const sp = splashParticles[i];
+          sp.x += sp.vx;
+          sp.y += sp.vy;
+          sp.vy += sp.gravity;
+          sp.alpha -= sp.decay;
+
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, sp.alpha);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.shadowColor = '#DFC08F';
+          ctx.shadowBlur = 4;
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, sp.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          if (sp.alpha <= 0 || sp.y > h) {
+            splashParticles.splice(i, 1);
+          }
+        }
+
+        requestAnimationFrame(animateBreachingScene);
+      }
+      animateBreachingScene();
+    }
+
+    function initWhaleSimulation() {
+      const whaleCanvas = document.getElementById('whale-canvas');
+      if (!whaleCanvas) return;
+      const wCtx = whaleCanvas.getContext('2d');
+      let wW = (whaleCanvas.width = window.innerWidth);
+      let wH = (whaleCanvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        wW = whaleCanvas.width = window.innerWidth;
+        wH = whaleCanvas.height = window.innerHeight;
+      });
+
+      // Majestic Deep Oceanic Humpback Whale Object
+      class HumpbackWhale {
+        constructor() {
+          this.reset();
+        }
+
+        reset() {
+          this.x = -350;
+          this.y = wH * (0.25 + Math.random() * 0.45);
+          this.speed = 0.55 + Math.random() * 0.4;
+          this.scale = 0.6 + Math.random() * 0.35;
+          this.phase = Math.random() * Math.PI * 2;
+          this.pitch = 0;
+          this.alpha = 0.45;
+        }
+
+        update() {
+          this.x += this.speed;
+          this.phase += 0.018;
+          // Organic undulating swim path
+          this.y += Math.sin(this.phase) * 0.75;
+          this.pitch = Math.sin(this.phase) * 0.08;
+
+          // Recycle when swimming completely off right side
+          if (this.x > wW + 400) {
+            this.reset();
+            this.x = -400;
+          }
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.pitch);
+          ctx.scale(this.scale, this.scale);
+          ctx.globalAlpha = this.alpha;
+
+          // Soft Ambient Glow
+          ctx.shadowColor = '#DFC08F';
+          ctx.shadowBlur = 18;
+
+          // Humpback Whale Sculptural Silhouette Path
+          ctx.beginPath();
+          ctx.moveTo(-160, 4); // Tail base
+          // Tail flukes with undulating motion
+          const flukeY = Math.sin(this.phase * 1.5) * 14;
+          ctx.quadraticCurveTo(-220, flukeY - 26, -260, flukeY - 48);
+          ctx.quadraticCurveTo(-230, flukeY - 6, -180, flukeY);
+          ctx.quadraticCurveTo(-230, flukeY + 6, -260, flukeY + 48);
+          ctx.quadraticCurveTo(-220, flukeY + 26, -160, 4);
+
+          // Whale Back and Dorsal Fin
+          ctx.bezierCurveTo(-110, -22, -40, -42, 40, -42);
+          ctx.quadraticCurveTo(80, -42, 130, -32);
+          ctx.bezierCurveTo(175, -20, 215, 6, 220, 18); // Head / Rostrum tip
+
+          // Whale Ventral Pleats / Jaw Line
+          ctx.bezierCurveTo(205, 36, 155, 48, 105, 48);
+          ctx.bezierCurveTo(20, 48, -40, 36, -90, 24);
+          ctx.quadraticCurveTo(-130, 16, -160, 4);
+          ctx.closePath();
+
+          // Luxury Whale Skin Gradient: Deep Makapu'u Slate to Soft Sand Ecru
+          const whaleGrad = ctx.createLinearGradient(-180, -40, 220, 40);
+          whaleGrad.addColorStop(0, 'rgba(40, 67, 102, 0.25)');
+          whaleGrad.addColorStop(0.5, 'rgba(197, 166, 118, 0.45)');
+          whaleGrad.addColorStop(1, 'rgba(244, 239, 230, 0.7)');
+          ctx.fillStyle = whaleGrad;
+          ctx.fill();
+
+          ctx.strokeStyle = 'rgba(223, 192, 143, 0.55)';
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+
+          // Pectoral Fin (Humpback's trademark long wing-like flipper)
+          ctx.beginPath();
+          ctx.moveTo(35, 12);
+          const finWag = Math.sin(this.phase) * 10;
+          ctx.bezierCurveTo(20, 50 + finWag, -25, 100 + finWag, -55, 125 + finWag);
+          ctx.bezierCurveTo(-45, 105 + finWag, -10, 55 + finWag, 55, 20);
+          ctx.closePath();
+          ctx.fillStyle = 'rgba(197, 166, 118, 0.35)';
+          ctx.fill();
+
+          ctx.restore();
+        }
+      }
+
+      const whales = [new HumpbackWhale()];
+
+      function animateWhaleSimulation() {
+        wCtx.clearRect(0, 0, wW, wH);
+        whales.forEach(whale => {
+          whale.update();
+          whale.draw(wCtx);
+        });
+        requestAnimationFrame(animateWhaleSimulation);
+      }
+      animateWhaleSimulation();
+    }
+
+    /* ==========================================================
+       REALISTIC PACIFIC OCEAN SURGE & BREAKING WHITECAP CANVAS
+       ========================================================== */
+    function initPacificRealisticOceanCanvas() {
+      const canvas = document.getElementById('pacific-ocean-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = (canvas.width = canvas.parentElement.clientWidth);
+      let h = (canvas.height = canvas.parentElement.clientHeight);
+
+      window.addEventListener('resize', () => {
+        if (canvas.parentElement) {
+          w = canvas.width = canvas.parentElement.clientWidth;
+          h = canvas.height = canvas.parentElement.clientHeight;
+        }
+      });
+
+      const foamParticles = [];
+      const sprayParticles = [];
+      const maxFoam = 45;
+      const maxSpray = 30;
+
+      class FoamBubble {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = h * 0.65 + Math.random() * (h * 0.35);
+          this.vx = (Math.random() - 0.5) * 1.5;
+          this.vy = -(0.5 + Math.random() * 1.8);
+          this.radius = 1.5 + Math.random() * 3.5;
+          this.alpha = 0.5 + Math.random() * 0.5;
+          this.decay = 0.008 + Math.random() * 0.015;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.alpha -= this.decay;
+          if (this.alpha <= 0 || this.y < h * 0.45) {
+            this.reset();
+          }
+        }
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.alpha);
+          ctx.fillStyle = '#FAF8F5';
+          ctx.shadowColor = '#FFFFFF';
+          ctx.shadowBlur = 6;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      class SurfSpray {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * w;
+          this.y = h * 0.62 + (Math.random() - 0.5) * 80;
+          this.vx = (Math.random() - 0.5) * 2.8;
+          this.vy = -(1.5 + Math.random() * 3.5);
+          this.gravity = 0.08;
+          this.size = 1 + Math.random() * 2;
+          this.alpha = 0.6 + Math.random() * 0.4;
+          this.decay = 0.015 + Math.random() * 0.02;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          this.vy += this.gravity;
+          this.alpha -= this.decay;
+          if (this.alpha <= 0 || this.y > h) {
+            this.reset();
+          }
+        }
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, this.alpha);
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      for (let i = 0; i < maxFoam; i++) foamParticles.push(new FoamBubble());
+      for (let i = 0; i < maxSpray; i++) sprayParticles.push(new SurfSpray());
+
+      let oceanTime = 0;
+      function renderPacificOcean() {
+        ctx.clearRect(0, 0, w, h);
+        oceanTime += 0.02;
+
+        // 1. Deep Ocean Background Gradients
+        const oceanGrad = ctx.createLinearGradient(0, h * 0.2, 0, h);
+        oceanGrad.addColorStop(0, '#060B12');
+        oceanGrad.addColorStop(0.3, '#0A1420');
+        oceanGrad.addColorStop(0.65, '#0F1E31');
+        oceanGrad.addColorStop(1, '#162A45');
+        ctx.fillStyle = oceanGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        // 2. Realistic Multi-layered Swell Wave Curves
+        const waveLayers = [
+          { yBase: h * 0.50, amp: 28, freq: 0.0035, speed: 0.015, color: 'rgba(15, 30, 49, 0.75)', foam: false },
+          { yBase: h * 0.60, amp: 42, freq: 0.0042, speed: 0.022, color: 'rgba(22, 42, 69, 0.85)', foam: false },
+          { yBase: h * 0.70, amp: 54, freq: 0.0038, speed: 0.028, color: 'rgba(40, 67, 102, 0.92)', foam: true },
+          { yBase: h * 0.80, amp: 40, freq: 0.0055, speed: 0.035, color: '#0A1420', foam: true }
+        ];
+
+        waveLayers.forEach((layer, lIdx) => {
+          ctx.beginPath();
+          ctx.moveTo(0, h);
+
+          const step = 8;
+          for (let x = 0; x <= w; x += step) {
+            const phase = x * layer.freq + oceanTime * (lIdx + 1) * 0.6;
+            const sineVal = Math.sin(phase);
+            const steepness = Math.pow((sineVal + 1) / 2, 1.8) * 2 - 1;
+            const y = layer.yBase + steepness * layer.amp + Math.cos(x * 0.008 - oceanTime) * 12;
+
+            if (x === 0) ctx.lineTo(x, y);
+            else ctx.lineTo(x, y);
+
+            if (layer.foam && steepness > 0.45) {
+              const crestIntensity = (steepness - 0.45) / 0.55;
+              ctx.save();
+              ctx.fillStyle = `rgba(255, 255, 255, ${0.45 * crestIntensity})`;
+              ctx.shadowColor = '#FFFFFF';
+              ctx.shadowBlur = 8;
+              ctx.fillRect(x - step, y - 2, step * 1.5, 4 + crestIntensity * 5);
+
+              ctx.fillStyle = 'rgba(244, 239, 230, 0.6)';
+              ctx.beginPath();
+              ctx.arc(x, y + Math.random() * 4, 1.5 + Math.random() * 2, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.restore();
+            }
+          }
+          ctx.lineTo(w, h);
+          ctx.closePath();
+          ctx.fillStyle = layer.color;
+          ctx.fill();
+
+          ctx.strokeStyle = layer.foam ? 'rgba(255, 255, 255, 0.6)' : 'rgba(197, 166, 118, 0.15)';
+          ctx.lineWidth = layer.foam ? 1.5 : 0.8;
+          ctx.stroke();
+        });
+
+        // 4. Update and Render Foam & Spray Particles
+        foamParticles.forEach(p => {
+          p.update();
+          p.draw(ctx);
+        });
+        sprayParticles.forEach(s => {
+          s.update();
+          s.draw(ctx);
+        });
+
+        requestAnimationFrame(renderPacificOcean);
+      }
+      renderPacificOcean();
+    }
+
+    /* ==========================================================
+       9. PROTOCOL TRANSMISSION SUBMIT
+       ========================================================== */
+    function handleSendProtocol() {
+      const name = document.getElementById('proto-name')?.value.trim() || '미작성';
+      const email = document.getElementById('proto-email')?.value.trim() || '미작성';
+      const subject = document.getElementById('proto-subject')?.value || '일반 문의';
+      const message = document.getElementById('proto-message')?.value.trim() || '내용 없음';
+
+      const targetEmail = 'id20wh@naver.com';
+      const mailSubject = `[엘오션인터내셔널 문의] ${subject} - ${name} 귀하`;
+      const mailBody = `■ 엘오션인터내셔널 Confidential Protocol 접수 내역\n\n` +
+                       `• 성함 / 기관명: ${name}\n` +
+                       `• 연락처 / 회신 이메일: ${email}\n` +
+                       `• 문의 유형: ${subject}\n\n` +
+                       `• 제안 및 질의 내용:\n${message}\n\n` +
+                       `─────────────────────────────\n` +
+                       `접수 일시: ${new Date().toLocaleString('ko-KR')}\n` +
+                       `수신처: ${targetEmail}`;
+
+      const mailtoUrl = `mailto:${targetEmail}?subject=${encodeURIComponent(mailSubject)}&body=${encodeURIComponent(mailBody)}`;
+
+      const successBox = document.getElementById('protocol-success');
+      if (successBox) {
+        successBox.innerText = `✓ id20wh@naver.com으로 보안 프로토콜을 전송합니다.`;
+        successBox.classList.remove('hidden');
+      }
+
+      // Open user's email client addressed to id20wh@naver.com
+      window.location.href = mailtoUrl;
+
+      setTimeout(() => {
+        if (successBox) successBox.classList.add('hidden');
+      }, 7000);
+    }
+  </script>
+</body>
+</html>
